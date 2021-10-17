@@ -1,0 +1,302 @@
+%{
+#include <iostream>
+#include <string>
+#include <map>
+#include <set>
+#include <cstdlib>
+#include <unordered_map>
+#include <exception>
+#include <vector>
+#include <fstream>
+struct Node{
+    virtual ~Node(){}
+};
+
+struct node_args : Node {
+    union {
+        std::string var_name;
+        int value;
+    };
+};
+
+
+struct node_func_call : Node {
+    std::string func_name;
+    vector <node_args> args;
+};
+
+struct node_literal : Node {
+    union {
+        std::string str;
+        int value;
+    };
+};
+
+
+struct node_f : Node {
+    union {
+        int value;
+        std::string var_name;
+    };
+};
+
+struct node_o : Node {
+    std::string type;
+    node_f * f;
+    node_o * o;
+};
+
+struct node_t : Node {
+    std::string type;
+    node_o * o;
+};
+
+struct node_q : Node {
+    std::string type;
+    node_q * q;
+    node_t * t;
+};
+
+struct node_r : Node {
+    std::string type;
+    node_r * r;
+    node_q * q;
+};
+
+struct node_u : Node {
+    std::string type;
+    node_r * r1;
+    node_r * r2;
+};
+
+struct node_w : Node { 
+    std::string type;
+    node_u * u;
+};
+
+struct node_e : Node {
+    std::string type;
+    node_w * w;
+    node_e * e;
+};
+
+struct node_m : Node {
+    std::string type;
+    node_e * e;
+    node_m * m;
+};
+
+struct node_operation : Node {
+    node_e * m;
+};
+
+struct node_expr : Node {
+    std::string type;
+    union {
+        std::string literal;
+        std::string var_name;
+        node_func_call * func_call;
+        node_operation * operation;
+    };
+};
+
+
+struct if_op {
+    node_expr * cond;
+    node_body * body;
+    node_body * n_else;
+};
+
+struct while_op {
+    node_expr * cond;
+    node_body * body;
+};
+
+struct skip_op : Node {};
+
+struct assignment_op {
+    std::string name;
+    node_expr * expr;
+};
+
+struct node_operator : Node {
+    std::string type;
+    union {
+        if_op if_st;
+        while_op while_st;
+        skip skip_st;
+        assignment_op assign;
+    };
+};
+
+struct node_body : Node {
+    node_operator * first_operator;
+    std::vector <node_operator *> operators;
+};
+
+
+struct node_func : Node {
+    std::string name;
+    std::vector <node_args> args;
+    node_body * body;
+};
+
+struct literal_type
+
+enum {
+    START = 1,
+    DEFAULT = 2,
+    TERMINAL = 3,
+    START_AND_TERMINAL = 4,
+};
+
+int yylex(); 
+void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
+%}
+
+%union {
+  std::string * word;
+  int val; 
+  char sym;
+  std::vector <node_func *> * functions_def_type;
+  std::vector <node_args> * func_args_type;
+  std::vector <node_operator * > operators_type;
+  node_expr * expression_type;
+  node_func * function_type;
+  node_args * args_type;
+  node_e * e_type;
+  node_m * m_type;
+  node_w * w_type;
+  node_r * r_type;
+  node_q * q_type;
+  node_t * t_type;
+  node_o * o_type;
+  node_f * f_type;
+  node_operation * operation_type;
+  node_func_call * func_call_type;
+  node_skip * skip_type;
+  node_body * body_type;
+  if_op * if_type;
+  assignment_op * assignment_type;
+  while_op * while_type;
+  node_operator * operator_type;
+  node_literal * literal_type;
+};
+%token <val> INT
+%token <sym> LP
+%token <sym> RP
+%token <sym> OPEN_PAREN 
+%token <sym> CLOSE_PAREN
+%token <sym> CURLY_OPEN_BR
+%token <sym> COMMA
+%token <sym> CURLY_CLOSE_BR
+%token <word> IF
+%token <word> WHILE
+%token <word> SKIP
+%token <word> SW
+%token <val> EPSILON
+%token <word> STRING
+%token <sym> QUESTION
+%token <word> AND
+%token <word> OR
+%token <sym> EXCLAM_P
+%token <sym> PLUS
+%token <sym> OPM
+%token <word> NOT_AS
+%token <sym> MINUS
+%token <sym> DEGREE
+
+%type <functions_def_type> func_def
+%type <function_type> function
+%type <word> name
+%type <func_args_type> args_seq
+%type <operators_type> operator_sequence
+%type <body_type> body
+%type <operator_type> operator 
+%type <if_type> if
+%type <while_type> while
+%type <skip_type> skip
+%type <assignment_type> assignment
+%type <function_call_type> function_call
+%type <expression_type> expression
+%type <word> name
+%type <func_args_type> non_empty_args_seq
+%type <args_type> arg
+%type <literal_type> literal
+%type <operation_type> operation
+%type <m_type> m
+%type <e_type> e
+%type <w_type> w
+%type <u_type> u
+%type <r_type> r
+%type <q_type> q
+%type <t_type> t
+%type <o_type> o
+%type <f_type> f  
+%%
+
+start: defin main {}
+
+defin: func_def {}
+
+func_def: EPSILON | function func_def {}
+
+function: name (args_seq) body {}
+
+body: CURLY_OPEN_BR operator_sequence CURLY_CLOSE_BR {}
+
+operator_sequence:  operator | operator operator_sequnce {}
+
+operator: while | if | skip | assignment | function_call {}
+
+while: WHILE OPEN_PAREN expr CLOSE_PAREN body {}
+
+if: IF OPEN_PAREN expr CLOSE_PAREN body else {}
+
+else: EPSILON | ELSE body {}
+
+skip: SKIP QUESTION {}
+
+assignment: name SW expr QUESTION {}
+
+function_call: name OPEN_PAREN args_seq CLOSE_PAREN {}
+
+args_seq: EPSILON | non_empty_args_seq {}
+
+non_empty_args_seq: arg | arg COMMA non_empty_args_seq {}
+
+expr: literal | name | function_call | operation {}
+
+literal: INT | STRING {}
+
+operation: m {}
+
+m: e OR m | e {}
+
+e: w AND e | w {}
+
+w: EXCLAM_P u | u {}
+
+u: r NOT_AS r | r {}
+
+r: r PLUS q  | p MINUS q | q {}
+
+q: q OPM t | t {}
+
+t: MINUS o | o {}
+
+o: f DEGREE o | f {}
+
+f: INT | name {}
+
+name: STRING {}
+%%
+
+int main(int argc, char ** argv)
+{
+    try{
+        yyparse();
+    } catch(...){
+    }
+}
+
