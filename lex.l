@@ -29,30 +29,34 @@ enum token {
 %option noyywrap
 
 
-INT10           -?[1-9][0-9]*|0
 INT2            2x-?[1][01]*|0
+INT10           -?[1-9][0-9]*|0
 OPEN_PAREN      \(
 CLOSE_PAREN     \)
 CURLY_OPEN_BR   \{
 CURLY_CLOSE_BR  \}
-COMMA_OPEN      \/\*
-COMMA_CLOSE     \*\/
-COMMA_ON_STRING \/\/.*\n
+COMM_OPEN       \/\*
+COMM_CLOSE      \*\/
+COMM_ON_STRING  \/\/.*\n
+COMMA           ,
+MAIN            main
 IF              if
+ELSE            else
 WHILE           while
 SKIP            skip
 SW              \|\=\|
 QUESTION        \?
-AND             and
-OR              or
+AND             \&\&
+OR              \|\|
 EXCLAM_P        !
 PLUS            \+
 OPM             \*|\/
 NOT_AS          ==|\/=|<=|<|>=|>
 MINUS           -
 DEGREE          \^
-USER_OPERATOR  \|.*\|
-STRING          [A-Za-z_0-9][A-Za-z_0-9]*
+USER_OPERATOR   \|.*\|
+STRING          \"[^"]*\"
+NAME_STRING     [A-Za-z][A-Za-z_0-9]*
 
 %%
 
@@ -101,18 +105,32 @@ STRING          [A-Za-z_0-9][A-Za-z_0-9]*
     printf("readed CURLY_CLOSE_BR\n");
     return CURLY_CLOSE_BR;
 }
-{COMMA_OPEN}    {
+{COMM_OPEN}    {
     num_of_open_comma++;
 }
-{COMMA_CLOSE} {
+{COMM_CLOSE} {
     if (num_of_open_comma <=0) {
         printf("ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
         exit(1);
     }
     num_of_open_comma--;
 }
-{COMMA_ON_STRING} {
+{COMM_ON_STRING} {
     strcom = true;
+}
+{COMMA} {
+    pos_before = position;
+    position++;
+    //yylval.sym = ',';
+    printf("readed COMMA\n");
+    return SW;
+}
+{MAIN} {
+    pos_before = position;
+    position += 4;
+    //yylval.word = "main";
+    printf("readed MAIN\n");
+    return IF;
 }
 {IF} {
     if (check_comma())
@@ -121,6 +139,13 @@ STRING          [A-Za-z_0-9][A-Za-z_0-9]*
     position += 2;
     //yylval.word = "if";
     printf("readed IF\n");
+    return IF;
+}
+{ELSE} {
+    pos_before = position;
+    position += 4;
+    //yylval.word = "else";
+    printf("readed ELSE\n");
     return IF;
 }
 {WHILE} {
@@ -154,14 +179,14 @@ STRING          [A-Za-z_0-9][A-Za-z_0-9]*
 {AND} {
     pos_before = position;
     position += 3;
-    //yylval.word = "and";
+    //yylval.word = "&&";
     printf("readed AND\n");
     return AND;
 }
 {OR} {
     pos_before = position;
     position += 2;
-    //yylval.word = "or";
+    //yylval.word = "||";
     printf("readed OR\n");
     return OR;
 }
@@ -175,7 +200,7 @@ STRING          [A-Za-z_0-9][A-Za-z_0-9]*
 {PLUS} {
     pos_before = position;
     position += 3;
-    //yylval.word = '|+|';
+    //yylval.word = "|+|";
     printf("readed PLUS\n");
     return PLUS;
 }
@@ -196,14 +221,14 @@ STRING          [A-Za-z_0-9][A-Za-z_0-9]*
 {MINUS}  {
     pos_before = position;
     position += 3;
-    //yylval.word = '|-|';
+    //yylval.word = "|-|";
     printf("readed MINUS\n");
     return MINUS;
 }
 {DEGREE}  {
     pos_before = position;
     position += 3;
-    //yylval.word = '|^|';
+    //yylval.word = "|^|";
     printf("readed DEGREE\n");
     return DEGREE;
 }
@@ -219,6 +244,13 @@ STRING          [A-Za-z_0-9][A-Za-z_0-9]*
     position += yyleng;
     //yylval.word = yytext;
     printf("readed STRING\n");
+    return STRING;
+}
+{NAME_STRING} {
+    pos_before = position;
+    position += yyleng;
+    //yylval.word = yytext;
+    printf("readed NAME_STRING\n");
     return STRING;
 }
 
@@ -258,4 +290,3 @@ int main(int argc, char* argv[]) {
   };
   return EXIT_SUCCESS ;
 }
-
