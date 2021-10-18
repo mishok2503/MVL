@@ -9,12 +9,12 @@
 #include <vector>
 #include <fstream>
 struct node_args;
-
+struct node_body;
 struct Node{
     virtual ~Node(){}
 };
 
-struct node_args : Node {
+struct node_args {
     union {
         std::string var_name;
         int value;
@@ -24,23 +24,19 @@ struct node_args : Node {
 };
 
 
-struct node_func_call : Node {
+struct node_func_call  {
     std::string func_name;
-    vector <node_args> args;
-    node_func_call(std::string * name, vector <node_args> * args_) : func_name(*name), args(*args_) {}
+    std::vector <node_args> args;
+    node_func_call(std::string * name, std::vector <node_args> * args_) : func_name(*name), args(*args_) {}
 };
 
-struct node_literal : Node {
-    union {
-        std::string str;
-        int value;
-    };
-    node_literal(int val) : value(val) {}
+struct node_literal  {
+    std::string str;
     node_literal(std::string * str_) : str(*str_) {}
 };
 
 
-struct node_f : Node {
+struct node_f {
     union {
         int value;
         std::string var_name;
@@ -51,7 +47,7 @@ struct node_f : Node {
     node_f(node_func_call * func) : func_call(func) {} 
 };
 
-struct node_o : Node {
+struct node_o {
     std::string type;
     node_f * f;
     node_o * o;
@@ -59,19 +55,19 @@ struct node_o : Node {
     node_o(node_f * f_) : type("NOTHING"), f(f_), o(nullptr) {}
 };
 
-struct node_t : Node {
+struct node_t {
     std::string type;
     node_o * o;
     node_t(char a, node_o * o_) : type("MINUS"), o(o_) {}
     node_t(node_o * o_) : type("NOTHING"), o(o_) {} 
 };
 
-struct node_q : Node {
+struct node_q {
     std::string type;
     node_q * q;
     node_t * t;
     node_q(node_t * t_) : type("NOTHING"), t(t_) {}
-    node_q(char op, node_q * q_, node_t * t_) q(q_), t(t_) {
+    node_q(char op, node_q * q_, node_t * t_): q(q_), t(t_) {
         if (op == '*'){
             type = "MULT";
         }
@@ -81,13 +77,13 @@ struct node_q : Node {
     }
 };
 
-struct node_r : Node {
+struct node_r {
     std::string type;
     node_r * r;
     node_q * q;
-    node_r(node_q * q_) : r(nullprt), q(q_){}
+    node_r(node_q * q_) : r(nullptr), q(q_){}
     node_r(char op, node_r * r_, node_q * q_) : r(r_), q(q_) {
-        if (op == "+"){
+        if (op == '+'){
             type = "PLUS";
         }
         if (op == '-'){
@@ -96,42 +92,42 @@ struct node_r : Node {
     }
 };
 
-struct node_u : Node {
+struct node_u {
     std::string type;
     node_r * r1;
     node_r * r2;
-    node_u(std::string * op, node_r * r1_, node_r2 * r2_) : type(*op), r1(r1_), r2(r2_) {}
+    node_u(std::string * op, node_r * r1_, node_r * r2_) : type(*op), r1(r1_), r2(r2_) {}
 };
 
-struct node_w : Node { 
+struct node_w { 
     std::string type;
     node_u * u;
     node_w(node_u * u_) : type("NOTHING"), u(u_) {}
     node_w(char op, node_u * u_) : type("UNARY MINUS"), u(u_) {}
 };
 
-struct node_e : Node {
+struct node_e {
     std::string type;
     node_w * w;
     node_e * e;
-    node_e(node_w * w_) : type("NOTHING"), e(e_), w(nullptr) {}
+    node_e(node_w * w_) : type("NOTHING"), e(nullptr), w(w_) {}
     node_e(std::string * op, node_w * w_, node_e * e_) : type("AND"), w(w_), e(e_) {}
 };
 
-struct node_m : Node {
+struct node_m {
     std::string type;
     node_e * e;
     node_m * m;
-    node_m(node_e * e_) : type("NOTHING"), e(e_), m(nullprt) {}
+    node_m(node_e * e_) : type("NOTHING"), e(e_), m(nullptr) {}
     node_m(std::string * op, node_e * e_, node_m * m_) : type("OR"), e(e_), m(m_) {}
 };
 
-struct node_operation : Node {
+struct node_operation {
     node_m * m;
     node_operation(node_m * m_) : m(m_) {}
 };
 
-struct node_expr : Node {
+struct node_expr {
     std::string type;
     union {
         node_literal *  literal;
@@ -159,7 +155,7 @@ struct while_op {
     while_op(node_expr * cond_, node_body * body_) : cond(cond_), body(body_) {}
 };
 
-struct skip_op : Node {};
+struct skip_op {};
 
 struct assignment_op {
     std::string name;
@@ -167,12 +163,12 @@ struct assignment_op {
     assignment_op(std::string * name_, node_expr * expr_) : name(*name_), expr(expr_) {}
 };
 
-struct node_operator : Node {
+struct node_operator {
     std::string type;
     union {
         if_op if_st;
         while_op while_st;
-        skip skip_st;
+        skip_op skip_st;
         assignment_op assign;
     };
     node_operator(if_op * if_) : type("IF"), if_st(*if_) {}
@@ -181,14 +177,14 @@ struct node_operator : Node {
     node_operator(assignment_op * assign_) : type("ASSIGNMENT"), assign(*assign_) {}
 };
 
-struct node_body : Node {
+struct node_body {
     node_operator * first_op;
     std::vector <node_operator *> operators;
     node_body(node_operator * op, std::vector <node_operator *> * operators_) : first_op(op), operators(*operators_) {}
 };
 
 
-struct node_func : Node {
+struct node_func {
     std::string name;
     std::vector <node_args> args;
     node_body * body;
@@ -219,7 +215,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
   node_f * f_type;
   node_operation * operation_type;
   node_func_call * func_call_type;
-  node_skip * skip_type;
+  skip_op * skip_type;
   node_body * body_type;
   if_op * if_type;
   assignment_op * assignment_type;
@@ -237,7 +233,6 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> WHILE
 %token <word> SKIP
 %token <word> SW
-%token <val> EPSILON
 %token <word> STRING
 %token <sym> QUESTION
 %token <word> AND
@@ -251,8 +246,6 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> ELSE
 %token <word> MAIN
 %token <word> NAME_STRING
-%token <sym> UNARY_MINUS
-%token <val> LITERAL_INT
 
 %type <functions_def_type> func_def
 %type <function_type> function
@@ -269,7 +262,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %type <function_call_type> function_call
 %type <expression_type> expression
 %type <args_type> arg
-//%type <literal_type> literal
+%type <literal_type> literal
 %type <operation_type> operation
 %type <m_type> m
 %type <e_type> e
@@ -323,13 +316,9 @@ args_seq: %empty { $$ = new func_args_type(); }
 arg: name { $$ = new args_type($1); }
 | INT { $$ = new args_type($1); }
 
-expression: /*literal { $$ = new expression_type($1); }
-| name { $$ = new expression_type($1); }
-| function_call { $$ = new expression_type($1); }
-| */operation { $$ = new expression_type($1); }
+expression: operation { $$ = new expression_type($1); }
 
-//literal: LITERAL_INT { $$ = new literal_type($1); }
-//| STRING { $$ = new literal_type($1); } 
+literal:  STRING { $$ = new literal_type($1); } 
 
 operation: m { $$ = new operation_type($1); }
 
@@ -360,6 +349,8 @@ o: f DEGREE o { $$ = new o_type($1, $3); }
 
 f: INT { $$ = new f_type($1); }
 | name { $$ = new f_type($1); }
+| function_call { $$ = new f_type($1); }
+| literal { $$ = new f_type($1); }
 
 name: NAME_STRING { $$ = $1; }
 %%
@@ -371,4 +362,3 @@ int main(int argc, char ** argv)
     } catch(...){
     }
 }
-
