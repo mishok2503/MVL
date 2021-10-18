@@ -44,9 +44,11 @@ struct node_f : Node {
     union {
         int value;
         std::string var_name;
+        node_func_call * func_call;
     };
     node_f(int v) : value(v) {}
-    node_f(std::string * name) : var_name(*name){}
+    node_f(std::string * name) : var_name(*name) {}
+    node_f(node_func_call * func) : func_call(func) {} 
 };
 
 struct node_o : Node {
@@ -180,8 +182,9 @@ struct node_operator : Node {
 };
 
 struct node_body : Node {
+    node_operator * first_op;
     std::vector <node_operator *> operators;
-    node_body(std::vector <node_operator *> * operators_) : operators(*operators_) {}
+    node_body(node_operator * op, std::vector <node_operator *> * operators_) : first_op(op), operators(*operators_) {}
 };
 
 
@@ -247,6 +250,9 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <sym> DEGREE
 %token <word> ELSE
 %token <word> MAIN
+%token <word> NAME_STRING
+%token <sym> UNARY_MINUS
+%token <val> LITERAL_INT
 
 %type <functions_def_type> func_def
 %type <function_type> function
@@ -263,7 +269,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %type <function_call_type> function_call
 %type <expression_type> expression
 %type <args_type> arg
-%type <literal_type> literal
+//%type <literal_type> literal
 %type <operation_type> operation
 %type <m_type> m
 %type <e_type> e
@@ -285,9 +291,9 @@ func_def: %empty { $$ = new functions_def_type(); }
 
 function: name OPEN_PAREN args_seq CLOSE_PAREN body { $$ = new function_type($1, $3, $5); }
 
-body: CURLY_OPEN_BR operator_sequence CURLY_CLOSE_BR { $$ = new body_type($2); }
+body: CURLY_OPEN_BR operator operator_sequence CURLY_CLOSE_BR { $$ = new body_type($2, $3); }
 
-main: MAIN body {}
+main: MAIN OPEN_PAREN CLOSE_PAREN  body {}
 
 operator_sequence: %empty { $$ = new operators_type(); } 
 | operator_sequence operator { $$->push_back($2); }
@@ -317,13 +323,13 @@ args_seq: %empty { $$ = new func_args_type(); }
 arg: name { $$ = new args_type($1); }
 | INT { $$ = new args_type($1); }
 
-expression: literal { $$ = new expression_type($1); }
+expression: /*literal { $$ = new expression_type($1); }
 | name { $$ = new expression_type($1); }
 | function_call { $$ = new expression_type($1); }
-| operation { $$ = new expression_type($1); }
+| */operation { $$ = new expression_type($1); }
 
-literal: INT { $$ = new literal_type($1); }
-| STRING { $$ = new literal_type($1); } 
+//literal: LITERAL_INT { $$ = new literal_type($1); }
+//| STRING { $$ = new literal_type($1); } 
 
 operation: m { $$ = new operation_type($1); }
 
@@ -347,7 +353,7 @@ q: q OPM t { $$ = new q_type($2, $1, $3); }
 | t { $$ = new q_type($1); }
 
 t: MINUS o { $$ = new t_type($1, $2); }
- | o { $$ = new t_type($1); }
+| o { $$ = new t_type($1); }
 
 o: f DEGREE o { $$ = new o_type($1, $3); } 
 | f { $$ = new o_type($1); }
@@ -355,7 +361,7 @@ o: f DEGREE o { $$ = new o_type($1, $3); }
 f: INT { $$ = new f_type($1); }
 | name { $$ = new f_type($1); }
 
-name: STRING { $$ = $1; }
+name: NAME_STRING { $$ = $1; }
 %%
 
 int main(int argc, char ** argv)
