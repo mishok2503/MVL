@@ -9,6 +9,8 @@
 #include <vector>
 #include <fstream>
 #include "structures.h"
+node_body * main_body;
+std::vector <node_func *> functions_definition;
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %}
@@ -100,7 +102,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 
 start: defin main {}
 
-defin: func_def {}
+defin: func_def { functions_definition = *$1; }
 
 func_def: %empty { $$ = new std::vector <node_func *>(); } 
 | func_def function { $$->push_back($2); }
@@ -109,7 +111,7 @@ function: name OPEN_PAREN args_seq CLOSE_PAREN body { $$ = new node_func($1, $3,
 
 body: CURLY_OPEN_BR operator operator_sequence CURLY_CLOSE_BR { $$ = new node_body($2, $3); }
 
-main: MAIN OPEN_PAREN CLOSE_PAREN  body {}
+main: MAIN OPEN_PAREN CLOSE_PAREN  body { main_body = $4; }
 
 operator_sequence: %empty { $$ = new std::vector <node_operator *>(); } 
 | operator_sequence operator { $$->push_back($2); }
