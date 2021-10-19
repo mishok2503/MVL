@@ -20,4 +20,5 @@ cp mvl_keywords.txt ~/.vim/
 
 ```
 
-Now you can see highlighting and use autocomplete, by pressing `Ctrl+n`, inside our `*.mvl` files.
+Now you can see highlighting and use autocomplete, by pressing `Ctrl+n`, inside our `*.mvl` files.  
+There is also automatic addition of brackets, and macroses `@m` for `main` function and `@f` for other functions.
