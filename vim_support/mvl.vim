@@ -37,4 +37,4 @@ set complete+=k~/.vim/mvl_keywords.txt
 imap ( ()
 imap { {}
 let @m='imain( {'
-" let @m='imain( {'
+let @f='A( {'
