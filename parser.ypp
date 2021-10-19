@@ -173,7 +173,8 @@ o: f DEGREE o { $$ = new node_o($1, $3); }
 | f { $$ = new node_o($1); }
 
 f: INT { $$ = new node_f($1); }
-| name { $$ = new node_f($1); }
+| INT2 { $$ = new node_f(1, $1); }
+| name { $$ = new node_f(2, $1); }
 | function_call { $$ = new node_f($1); }
 | literal { $$ = new node_f($1); }
 

@@ -28,9 +28,17 @@ struct node_f {
         std::string var_name;
         node_func_call * func_call;
         node_literal * literal;
+        std::string int2_value;
     node_f(node_literal * literal_) : literal(literal_) {} 
     node_f(int v) : value(v) {}
-    node_f(std::string * name) : var_name(*name) {}
+    node_f(int flag, std::string * name){
+        if (flag == 1){
+            int2_value = *name;
+        }
+        if (flag == 2){
+            var_name = *name;
+        }
+    }
     node_f(node_func_call * func) : func_call(func) {} 
 };
 
