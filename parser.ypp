@@ -8,189 +8,7 @@
 #include <exception>
 #include <vector>
 #include <fstream>
-struct node_args;
-struct node_body;
-struct Node{
-    virtual ~Node(){}
-};
-
-struct node_args {
-    union {
-        std::string var_name;
-        int value;
-    };
-    node_args(std::string * name) : var_name(*name) {}
-    node_args(int val) : value(val) {}
-};
-
-
-struct node_func_call  {
-    std::string func_name;
-    std::vector <node_args> args;
-    node_func_call(std::string * name, std::vector <node_args> * args_) : func_name(*name), args(*args_) {}
-};
-
-struct node_literal  {
-    std::string str;
-    node_literal(std::string * str_) : str(*str_) {}
-};
-
-
-struct node_f {
-    union {
-        int value;
-        std::string var_name;
-        node_func_call * func_call;
-    };
-    node_f(int v) : value(v) {}
-    node_f(std::string * name) : var_name(*name) {}
-    node_f(node_func_call * func) : func_call(func) {} 
-};
-
-struct node_o {
-    std::string type;
-    node_f * f;
-    node_o * o;
-    node_o(node_f * f_, node_o * o_) : type("DEGREE"), f(f_), o(o_) {}
-    node_o(node_f * f_) : type("NOTHING"), f(f_), o(nullptr) {}
-};
-
-struct node_t {
-    std::string type;
-    node_o * o;
-    node_t(char a, node_o * o_) : type("MINUS"), o(o_) {}
-    node_t(node_o * o_) : type("NOTHING"), o(o_) {} 
-};
-
-struct node_q {
-    std::string type;
-    node_q * q;
-    node_t * t;
-    node_q(node_t * t_) : type("NOTHING"), t(t_) {}
-    node_q(char op, node_q * q_, node_t * t_): q(q_), t(t_) {
-        if (op == '*'){
-            type = "MULT";
-        }
-        if (op == '/'){
-            type = "DIV";
-        }
-    }
-};
-
-struct node_r {
-    std::string type;
-    node_r * r;
-    node_q * q;
-    node_r(node_q * q_) : r(nullptr), q(q_){}
-    node_r(char op, node_r * r_, node_q * q_) : r(r_), q(q_) {
-        if (op == '+'){
-            type = "PLUS";
-        }
-        if (op == '-'){
-            type = "MINUS";
-        }
-    }
-};
-
-struct node_u {
-    std::string type;
-    node_r * r1;
-    node_r * r2;
-    node_u(std::string * op, node_r * r1_, node_r * r2_) : type(*op), r1(r1_), r2(r2_) {}
-};
-
-struct node_w { 
-    std::string type;
-    node_u * u;
-    node_w(node_u * u_) : type("NOTHING"), u(u_) {}
-    node_w(char op, node_u * u_) : type("UNARY MINUS"), u(u_) {}
-};
-
-struct node_e {
-    std::string type;
-    node_w * w;
-    node_e * e;
-    node_e(node_w * w_) : type("NOTHING"), e(nullptr), w(w_) {}
-    node_e(std::string * op, node_w * w_, node_e * e_) : type("AND"), w(w_), e(e_) {}
-};
-
-struct node_m {
-    std::string type;
-    node_e * e;
-    node_m * m;
-    node_m(node_e * e_) : type("NOTHING"), e(e_), m(nullptr) {}
-    node_m(std::string * op, node_e * e_, node_m * m_) : type("OR"), e(e_), m(m_) {}
-};
-
-struct node_operation {
-    node_m * m;
-    node_operation(node_m * m_) : m(m_) {}
-};
-
-struct node_expr {
-    std::string type;
-    union {
-        node_literal *  literal;
-        std::string var_name;
-        node_func_call * func_call;
-        node_operation * operation;
-    };
-    node_expr(std::string * str) : var_name(*str) {}
-    node_expr(node_literal * lit) : literal(lit) {}
-    node_expr(node_func_call * func) : func_call(func) {}
-    node_expr(node_operation * op) : operation(op) {}
-}; 
-
-
-struct if_op {
-    node_expr * cond;
-    node_body * body;
-    node_body * n_else;
-    if_op(node_expr * cond_, node_body * body_, node_body * else_) : cond(cond_), body(body_), n_else(else_) {}
-};
-
-struct while_op {
-    node_expr * cond;
-    node_body * body;
-    while_op(node_expr * cond_, node_body * body_) : cond(cond_), body(body_) {}
-};
-
-struct skip_op {};
-
-struct assignment_op {
-    std::string name;
-    node_expr * expr;
-    assignment_op(std::string * name_, node_expr * expr_) : name(*name_), expr(expr_) {}
-};
-
-struct node_operator {
-    std::string type;
-    union {
-        if_op if_st;
-        while_op while_st;
-        skip_op skip_st;
-        assignment_op assign;
-    };
-    node_operator(if_op * if_) : type("IF"), if_st(*if_) {}
-    node_operator(while_op * while_st_) : type("WHILE"), while_st(*while_st_) {}
-    node_operator(skip * skip_st_) : type("SKIP"), skip_st(*skip_st_) {}
-    node_operator(assignment_op * assign_) : type("ASSIGNMENT"), assign(*assign_) {}
-};
-
-struct node_body {
-    node_operator * first_op;
-    std::vector <node_operator *> operators;
-    node_body(node_operator * op, std::vector <node_operator *> * operators_) : first_op(op), operators(*operators_) {}
-};
-
-
-struct node_func {
-    std::string name;
-    std::vector <node_args> args;
-    node_body * body;
-    node_func(std::string * name_, std::vector <node_args> * args_, node_body * body_) : name(*name_), args(*args_), body(body_) {}
-};
-
+#include "structures.h"
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %}
@@ -206,6 +24,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
   node_func * function_type;
   node_args * args_type;
   node_e * e_type;
+  node_u * u_type;
   node_m * m_type;
   node_w * w_type;
   node_r * r_type;
@@ -241,11 +60,12 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> PLUS
 %token <sym> OPM
 %token <word> NOT_AS
-%token <sym> MINUS
+%token <word> MINUS
 %token <sym> DEGREE
 %token <word> ELSE
 %token <word> MAIN
 %token <word> NAME_STRING
+%token <sym> UNARY_MINUS
 
 %type <functions_def_type> func_def
 %type <function_type> function
@@ -259,7 +79,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %type <while_type> while
 %type <skip_type> skip
 %type <assignment_type> assignment
-%type <function_call_type> function_call
+%type <func_call_type> function_call
 %type <expression_type> expression
 %type <args_type> arg
 %type <literal_type> literal
@@ -279,78 +99,78 @@ start: defin main {}
 
 defin: func_def {}
 
-func_def: %empty { $$ = new functions_def_type(); } 
+func_def: %empty { $$ = new std::vector <node_func *>(); } 
 | func_def function { $$->push_back($2); }
 
-function: name OPEN_PAREN args_seq CLOSE_PAREN body { $$ = new function_type($1, $3, $5); }
+function: name OPEN_PAREN args_seq CLOSE_PAREN body { $$ = new node_func($1, $3, $5); }
 
-body: CURLY_OPEN_BR operator operator_sequence CURLY_CLOSE_BR { $$ = new body_type($2, $3); }
+body: CURLY_OPEN_BR operator operator_sequence CURLY_CLOSE_BR { $$ = new node_body($2, $3); }
 
 main: MAIN OPEN_PAREN CLOSE_PAREN  body {}
 
-operator_sequence: %empty { $$ = new operators_type(); } 
+operator_sequence: %empty { $$ = new std::vector <node_operator *>(); } 
 | operator_sequence operator { $$->push_back($2); }
 
-operator: while { $$ = new operator_type($1); }
-| if { $$ = new_operator_type($1); }
-| skip { $$ = new operator_type($1); }
-| assignment { $$ = new_operator_type($1); }
-| function_call { $$ = new_operator_type($1); }
+operator: while { $$ = new node_operator($1); }
+| if { $$ = new node_operator($1); }
+| skip { $$ = new node_operator($1); }
+| assignment { $$ = new node_operator($1); }
+| function_call { $$ = new node_operator($1); }
 
-while: WHILE OPEN_PAREN expression CLOSE_PAREN body { $$ = new while_type($3, $5); }
+while: WHILE OPEN_PAREN expression CLOSE_PAREN body { $$ = new while_op($3, $5); }
 
-if: IF OPEN_PAREN expression CLOSE_PAREN body else { $$ = new if_type($3, $5, $6); }
+if: IF OPEN_PAREN expression CLOSE_PAREN body else { $$ = new if_op($3, $5, $6); }
 
 else: %empty { $$ = nullptr; }
 | ELSE body { $$ = $2; }
 
-skip: SKIP QUESTION { $$ = new skip_type(); }
+skip: SKIP QUESTION { $$ = new skip_op(); }
 
-assignment: name SW expression QUESTION { $$ = new assignment_type($1, $3); }
+assignment: name SW expression QUESTION { $$ = new assignment_op($1, $3); }
 
-function_call: name OPEN_PAREN args_seq CLOSE_PAREN { $$ = new func_call_type($1, $3); }
+function_call: name OPEN_PAREN args_seq CLOSE_PAREN { $$ = new node_func_call($1, $3); }
 
-args_seq: %empty { $$ = new func_args_type(); }
+args_seq: %empty { $$ = new std::vector <node_args>(); }
 | args_seq COMMA arg { $$->push_back(*$3); }
 
-arg: name { $$ = new args_type($1); }
-| INT { $$ = new args_type($1); }
+arg: name { $$ = new node_args($1); }
+| INT { $$ = new node_args($1); }
 
-expression: operation { $$ = new expression_type($1); }
+expression: operation { $$ = new node_expr($1); }
 
-literal:  STRING { $$ = new literal_type($1); } 
+literal:  STRING { $$ = new node_literal($1); } 
 
-operation: m { $$ = new operation_type($1); }
+operation: m { $$ = new node_operation($1); }
 
-m: e OR m { $$ = new m_type($2, $1, $3); }
-| e { $$ = new m_type($1); }
+m: e OR m { $$ = new node_m($2, $1, $3); }
+| e { $$ = new node_m($1); }
 
-e: w AND e { $$ = new e_type($2, $1, $3); }
-| w { $$ = new e_type($1); }
+e: w AND e { $$ = new node_e($2, $1, $3); }
+| w { $$ = new node_e($1); }
 
-w: EXCLAM_P u { $$ = new w_type($1, $2); }
-| u { $$ = new w_type($1); }
+w: EXCLAM_P u { $$ = new node_w($1, $2); }
+| u { $$ = new node_w($1); }
 
-u: r NOT_AS r { $$ = new u_type($2, $1, $3); }
-| r { $$ = new u_type($1); }
+u: r NOT_AS r { $$ = new node_u($2, $1, $3); }
+| r { $$ = new node_u($1); }
 
-r: r PLUS q  { $$ = new r_type($2, $1, $3); }
-| r MINUS q { $$ = new r_type($2, $1, $3); }
-| q { $$ = new r_type($1); }
+r: r PLUS q  { $$ = new node_r($2, $1, $3); }
+| r MINUS q { $$ = new node_r($2, $1, $3); }
+| q { $$ = new node_r($1); }
 
-q: q OPM t { $$ = new q_type($2, $1, $3); } 
-| t { $$ = new q_type($1); }
+q: q OPM t { $$ = new node_q($2, $1, $3); } 
+| t { $$ = new node_q($1); }
 
-t: MINUS o { $$ = new t_type($1, $2); }
-| o { $$ = new t_type($1); }
+t: UNARY_MINUS o { $$ = new node_t($1, $2); }
+| o { $$ = new node_t($1); }
 
-o: f DEGREE o { $$ = new o_type($1, $3); } 
-| f { $$ = new o_type($1); }
+o: f DEGREE o { $$ = new node_o($1, $3); } 
+| f { $$ = new node_o($1); }
 
-f: INT { $$ = new f_type($1); }
-| name { $$ = new f_type($1); }
-| function_call { $$ = new f_type($1); }
-| literal { $$ = new f_type($1); }
+f: INT { $$ = new node_f($1); }
+| name { $$ = new node_f($1); }
+| function_call { $$ = new node_f($1); }
+| literal { $$ = new node_f($1); }
 
 name: NAME_STRING { $$ = $1; }
 %%
