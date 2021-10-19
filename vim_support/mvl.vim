@@ -36,3 +36,5 @@ hi MvlComment ctermfg=LightGrey
 set complete+=k~/.vim/mvl_keywords.txt
 imap ( ()
 imap { {}
+let @m='imain( {'
+" let @m='imain( {'
