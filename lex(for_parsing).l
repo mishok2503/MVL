@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-//#include "gram.tab.hpp"
+#include "gram.tab.hpp"
 
 #define true 1
 #define false 0
@@ -17,12 +17,6 @@ int check_comma() {
     	return true;
     return false;
 }
-
-enum token {
-  INT10 = 1, INT2 = 2, OPEN_PAREN = 3, CLOSE_PAREN = 4, CURLY_OPEN_BR = 5, CURLY_CLOSE_BR = 6, COMMA_OPEN = 7, COMMA_CLOSE = 8,
-  COMMA_ON_STRING = 9, IF = 10, WHILE = 11, SKIP = 12, SW = 13, QUESTION = 14, AND = 15, OR = 16, EXCLAM_P = 17, PLUS = 18, OPM = 19,
-  NOT_AS = 20, MINUS = 21, DEGREE = 22, USER_OPERATOR = 23, STRING = 24, COMMA = 25, MAIN = 26, ELSE = 27, COLON = 28, NAME_STRING = 29
-};
 %}
 
 %option yylineno
@@ -339,13 +333,3 @@ exit(1);
 }
 
 %%
-
-int main(int argc, char* argv[]) {
-  while (1) {
-    enum token t = yylex();
-    if (t == 0) {
-      break;
-    }
-  };
-  return EXIT_SUCCESS ;
-}
