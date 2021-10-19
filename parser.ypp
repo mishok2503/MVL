@@ -8,148 +8,7 @@
 #include <exception>
 #include <vector>
 #include <fstream>
-struct Node{
-    virtual ~Node(){}
-};
-
-struct node_args : Node {
-    union {
-        std::string var_name;
-        int value;
-    };
-};
-
-
-struct node_func_call : Node {
-    std::string func_name;
-    vector <node_args> args;
-};
-
-struct node_literal : Node {
-    union {
-        std::string str;
-        int value;
-    };
-};
-
-
-struct node_f : Node {
-    union {
-        int value;
-        std::string var_name;
-    };
-};
-
-struct node_o : Node {
-    std::string type;
-    node_f * f;
-    node_o * o;
-};
-
-struct node_t : Node {
-    std::string type;
-    node_o * o;
-};
-
-struct node_q : Node {
-    std::string type;
-    node_q * q;
-    node_t * t;
-};
-
-struct node_r : Node {
-    std::string type;
-    node_r * r;
-    node_q * q;
-};
-
-struct node_u : Node {
-    std::string type;
-    node_r * r1;
-    node_r * r2;
-};
-
-struct node_w : Node { 
-    std::string type;
-    node_u * u;
-};
-
-struct node_e : Node {
-    std::string type;
-    node_w * w;
-    node_e * e;
-};
-
-struct node_m : Node {
-    std::string type;
-    node_e * e;
-    node_m * m;
-};
-
-struct node_operation : Node {
-    node_e * m;
-};
-
-struct node_expr : Node {
-    std::string type;
-    union {
-        std::string literal;
-        std::string var_name;
-        node_func_call * func_call;
-        node_operation * operation;
-    };
-};
-
-
-struct if_op {
-    node_expr * cond;
-    node_body * body;
-    node_body * n_else;
-};
-
-struct while_op {
-    node_expr * cond;
-    node_body * body;
-};
-
-struct skip_op : Node {};
-
-struct assignment_op {
-    std::string name;
-    node_expr * expr;
-};
-
-struct node_operator : Node {
-    std::string type;
-    union {
-        if_op if_st;
-        while_op while_st;
-        skip skip_st;
-        assignment_op assign;
-    };
-};
-
-struct node_body : Node {
-    node_operator * first_operator;
-    std::vector <node_operator *> operators;
-};
-
-
-struct node_func : Node {
-    std::string name;
-    std::vector <node_args> args;
-    node_body * body;
-};
-
-struct literal_type
-
-enum {
-    START = 1,
-    DEFAULT = 2,
-    TERMINAL = 3,
-    START_AND_TERMINAL = 4,
-};
-
+#include "structures.h"
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %}
@@ -160,11 +19,12 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
   char sym;
   std::vector <node_func *> * functions_def_type;
   std::vector <node_args> * func_args_type;
-  std::vector <node_operator * > operators_type;
+  std::vector <node_operator * > * operators_type;
   node_expr * expression_type;
   node_func * function_type;
   node_args * args_type;
   node_e * e_type;
+  node_u * u_type;
   node_m * m_type;
   node_w * w_type;
   node_r * r_type;
@@ -174,7 +34,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
   node_f * f_type;
   node_operation * operation_type;
   node_func_call * func_call_type;
-  node_skip * skip_type;
+  skip_op * skip_type;
   node_body * body_type;
   if_op * if_type;
   assignment_op * assignment_type;
@@ -183,8 +43,6 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
   node_literal * literal_type;
 };
 %token <val> INT
-%token <sym> LP
-%token <sym> RP
 %token <sym> OPEN_PAREN 
 %token <sym> CLOSE_PAREN
 %token <sym> CURLY_OPEN_BR
@@ -194,17 +52,23 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> WHILE
 %token <word> SKIP
 %token <word> SW
-%token <val> EPSILON
 %token <word> STRING
 %token <sym> QUESTION
 %token <word> AND
 %token <word> OR
 %token <sym> EXCLAM_P
-%token <sym> PLUS
+%token <word> PLUS
 %token <sym> OPM
 %token <word> NOT_AS
-%token <sym> MINUS
+%token <word> MINUS
 %token <sym> DEGREE
+%token <word> ELSE
+%token <word> MAIN
+%token <word> NAME_STRING
+%token <sym> UNARY_MINUS
+%token <word> INT2
+%token <sym> COLON
+%token <word> USER_OPERATOR
 
 %type <functions_def_type> func_def
 %type <function_type> function
@@ -212,15 +76,14 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %type <func_args_type> args_seq
 %type <operators_type> operator_sequence
 %type <body_type> body
+%type <body_type> else
 %type <operator_type> operator 
 %type <if_type> if
 %type <while_type> while
 %type <skip_type> skip
 %type <assignment_type> assignment
-%type <function_call_type> function_call
+%type <func_call_type> function_call
 %type <expression_type> expression
-%type <word> name
-%type <func_args_type> non_empty_args_seq
 %type <args_type> arg
 %type <literal_type> literal
 %type <operation_type> operation
@@ -239,57 +102,80 @@ start: defin main {}
 
 defin: func_def {}
 
-func_def: EPSILON | function func_def {}
+func_def: %empty { $$ = new std::vector <node_func *>(); } 
+| func_def function { $$->push_back($2); }
 
-function: name (args_seq) body {}
+function: name OPEN_PAREN args_seq CLOSE_PAREN body { $$ = new node_func($1, $3, $5); }
 
-body: CURLY_OPEN_BR operator_sequence CURLY_CLOSE_BR {}
+body: CURLY_OPEN_BR operator operator_sequence CURLY_CLOSE_BR { $$ = new node_body($2, $3); }
 
-operator_sequence:  operator | operator operator_sequnce {}
+main: MAIN OPEN_PAREN CLOSE_PAREN  body {}
 
-operator: while | if | skip | assignment | function_call {}
+operator_sequence: %empty { $$ = new std::vector <node_operator *>(); } 
+| operator_sequence operator { $$->push_back($2); }
 
-while: WHILE OPEN_PAREN expr CLOSE_PAREN body {}
+operator: while { $$ = new node_operator($1); }
+| if { $$ = new node_operator($1); }
+| skip { $$ = new node_operator($1); }
+| assignment { $$ = new node_operator($1); }
+| function_call { $$ = new node_operator($1); }
 
-if: IF OPEN_PAREN expr CLOSE_PAREN body else {}
+while: WHILE OPEN_PAREN expression CLOSE_PAREN body { $$ = new while_op($3, $5); }
 
-else: EPSILON | ELSE body {}
+if: IF OPEN_PAREN expression CLOSE_PAREN body else { $$ = new if_op($3, $5, $6); }
 
-skip: SKIP QUESTION {}
+else: %empty { $$ = nullptr; }
+| ELSE body { $$ = $2; }
 
-assignment: name SW expr QUESTION {}
+skip: SKIP QUESTION { $$ = new skip_op(); }
 
-function_call: name OPEN_PAREN args_seq CLOSE_PAREN {}
+assignment: name SW expression QUESTION { $$ = new assignment_op($1, $3); }
 
-args_seq: EPSILON | non_empty_args_seq {}
+function_call: name OPEN_PAREN args_seq CLOSE_PAREN { $$ = new node_func_call($1, $3); }
 
-non_empty_args_seq: arg | arg COMMA non_empty_args_seq {}
+args_seq: %empty { $$ = new std::vector <node_args>(); }
+| args_seq COMMA arg { $$->push_back(*$3); }
 
-expr: literal | name | function_call | operation {}
+arg: name { $$ = new node_args($1); }
+| INT { $$ = new node_args($1); }
 
-literal: INT | STRING {}
+expression: operation { $$ = new node_expr($1); }
 
-operation: m {}
+literal:  STRING { $$ = new node_literal($1); } 
 
-m: e OR m | e {}
+operation: m { $$ = new node_operation($1); }
 
-e: w AND e | w {}
+m: e OR m { $$ = new node_m($2, $1, $3); }
+| e { $$ = new node_m($1); }
 
-w: EXCLAM_P u | u {}
+e: w AND e { $$ = new node_e($2, $1, $3); }
+| w { $$ = new node_e($1); }
 
-u: r NOT_AS r | r {}
+w: EXCLAM_P u { $$ = new node_w($1, $2); }
+| u { $$ = new node_w($1); }
 
-r: r PLUS q  | p MINUS q | q {}
+u: r NOT_AS r { $$ = new node_u($2, $1, $3); }
+| r { $$ = new node_u($1); }
 
-q: q OPM t | t {}
+r: r PLUS q  { $$ = new node_r($2, $1, $3); }
+| r MINUS q { $$ = new node_r($2, $1, $3); }
+| q { $$ = new node_r($1); }
 
-t: MINUS o | o {}
+q: q OPM t { $$ = new node_q($2, $1, $3); } 
+| t { $$ = new node_q($1); }
 
-o: f DEGREE o | f {}
+t: UNARY_MINUS o { $$ = new node_t($1, $2); }
+| o { $$ = new node_t($1); }
 
-f: INT | name {}
+o: f DEGREE o { $$ = new node_o($1, $3); } 
+| f { $$ = new node_o($1); }
 
-name: STRING {}
+f: INT { $$ = new node_f($1); }
+| name { $$ = new node_f($1); }
+| function_call { $$ = new node_f($1); }
+| literal { $$ = new node_f($1); }
+
+name: NAME_STRING { $$ = $1; }
 %%
 
 int main(int argc, char ** argv)
@@ -299,4 +185,3 @@ int main(int argc, char ** argv)
     } catch(...){
     }
 }
-
