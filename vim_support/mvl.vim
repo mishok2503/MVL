@@ -21,7 +21,7 @@ hi Function ctermfg=Green
 " Operators
 syn match CreateOperator /(\s*\w\+\s*|.\+|\s*\w\+\s*):/ contains=AssOperator
 syn match AssOperator /|\([-+*/^]\|&&\|||\)\+|/
-syn match NonAssOperator /|\([<>=/]=\|[<>=]\|\)\+|/
+syn match NonAssOperator /|\([<>=/]=\|[<>=]\)\+|/
 hi CreateOperator ctermfg=Cyan
 hi AssOperator ctermfg=Green
 hi NonAssOperator ctermfg=Red
@@ -31,3 +31,10 @@ syn region MvlComment start=/+_+/ end=/-_-/ contains=MvlComment,ComKeyword
 syn keyword ComKeyword TODO MVL contained
 hi ComKeyword ctermfg=Blue
 hi MvlComment ctermfg=LightGrey
+
+" Autocomplete
+set complete+=k~/.vim/mvl_keywords.txt
+imap ( ()
+imap { {}
+let @m='imain( {'
+let @f='A( {'
