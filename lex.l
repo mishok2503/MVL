@@ -27,7 +27,7 @@ int check_comma() {
 
 
 INT2            2x-?[1][01]*|0
-INT10           -?[1-9][0-9]*|0
+INT           -?[1-9][0-9]*|0
 OPEN_PAREN      \(
 CLOSE_PAREN     \)
 CURLY_OPEN_BR   \{
@@ -60,22 +60,22 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
 
 
 
-{INT10} {
+{INT} {
     n = atoi(yytext);
     pos_before = position;
     position += yyleng;
     if (check_comma() == 1)
         break;
     yylval.val = n;
-    printf("readed INT10\n");
-    return INT10;
+    printf("readed INT\n");
+    return INT;
 }
 {INT2} {
     pos_before = position;
     position += yyleng;
     if (check_comma() == 1)
         break;
-    yylval.word = yytext;
+    yylval.word = new std::string(yytext, yyleng);
     printf("readed INT2\n");
     return INT2;
 }
@@ -142,7 +142,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 4;
     if (check_comma() == 1)
         break;
-    yylval.word = "main";
+    yylval.word = new std::string("main", 5);
     printf("readed MAIN\n");
     return MAIN;
 }
@@ -151,7 +151,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 2;
     if (check_comma() == 1)
         break;
-    yylval.word = "if";
+    yylval.word = new std::string("if", 3);
     printf("readed IF\n");
     return IF;
 }
@@ -160,7 +160,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 4;
     if (check_comma() == 1)
         break;
-    yylval.word = "else";
+    yylval.word = new std::string("else", 5);
     printf("readed ELSE\n");
     return ELSE;
 }
@@ -169,7 +169,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 5;
     if (check_comma() == 1)
         break;
-    yylval.word = "while";
+    yylval.word = new std::string("while", 6);
     printf("readed WHILE\n");
     return WHILE;
 }
@@ -178,7 +178,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 4;
     if (check_comma() == 1)
         break;
-    yylval.word = "skip";
+    yylval.word = new std::string("skip", 5);
     printf("readed SKIP\n");
     return SKIP;
 }
@@ -187,7 +187,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = "|=|";
+    yylval.word = new std::string("|=|", 4);
     printf("readed SW\n");
     return SW;
 }
@@ -205,7 +205,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = "&&";
+    yylval.word = new std::string("&&", 3);
     printf("readed AND\n");
     return AND;
 }
@@ -214,7 +214,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 2;
     if (check_comma() == 1)
         break;
-    yylval.word = "||";
+    yylval.word = new std::string("||", 3);
     printf("readed OR\n");
     return OR;
 }
@@ -232,7 +232,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = "|+|";
+    yylval.word = new std::string("|+|", 4);
     printf("readed PLUS\n");
     return PLUS;
 }
@@ -241,7 +241,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position++;
     if (check_comma() == 1)
         break;
-    yylval.word = yytext;
+    yylval.word = new std::string(yytext, yyleng);
     printf("readed OPM\n");
     return OPM;
 }
@@ -250,7 +250,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += yyleng;
     if (check_comma() == 1)
         break;
-    yylval.word = yytext;
+    yylval.word = new std::string(yytext, yyleng);
     printf("readed NOT_AS\n");
     return NOT_AS;
 }
@@ -259,7 +259,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = "|-|";
+    yylval.word = new std::string("|-|", 4);
     printf("readed MINUS\n");
     return MINUS;
 }
@@ -268,7 +268,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = "|^|";
+    yylval.word = new std::string("|^|", 4);
     printf("readed DEGREE\n");
     return DEGREE;
 }
@@ -277,7 +277,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += yyleng;
     if (check_comma() == 1)
         break;
-    yylval.word = yytext;
+    yylval.word = new std::string(yytext, yyleng);
     printf("readed USER_OPERATOR\n");
     return USER_OPERATOR;
 }
@@ -295,7 +295,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += yyleng;
     if (check_comma() == 1)
         break;
-    yylval.word = yytext;
+    yylval.word = new std::string(yytext, yyleng);
     printf("readed STRING\n");
     return STRING;
 }
@@ -304,7 +304,7 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     position += yyleng;
     if (check_comma() == 1)
         break;
-    yylval.word = yytext;
+    yylval.word = new std::string(yytext, yyleng);
     printf("readed NAME_STRING\n");
     return NAME_STRING;
 }

@@ -66,6 +66,9 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> MAIN
 %token <word> NAME_STRING
 %token <sym> UNARY_MINUS
+%token <word> INT2
+%token <sym> COLON
+%token <word> USER_OPERATOR
 
 %type <functions_def_type> func_def
 %type <function_type> function
