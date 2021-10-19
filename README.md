@@ -1,6 +1,70 @@
 # MVL
 ### a.k.a Most Valuable Language
 
+## Syntax
+
+##### Functions defenitions
+
+```
+f_name(arg1, arg2) {
+    skip?
+}
+```
+
+##### Loops
+
+```
+while (expr) {
+    skip?
+}
+```
+
+##### Operators
+
+base operators: `+, -, *, /, ^, !, <, >, =, [<>=/]=`
+operator = `|(base operators)+|`
+
+##### If
+
+```
+if (expr) {
+    skip?
+} 
+```
+
+```
+if (expr) {
+    skip?
+} else {
+    skip?
+}
+```
+
+##### Operators overloading
+
+```
+(l |new operator| r): {
+    skip?
+}
+```
+
+##### Comments
+###### multistring
+open: `+_+`, close - `-_-`  
+example:
+```
++_+ comment here 
+  +_+ and here -_- 
+still here -_-
+```
+###### singlestring
+syntax: `O_o`
+example:
+```
+O_o comment here O_o and here
+not comment
+```
+
 ## Vim support
 
 ![Alt text](vim_support/images/example.png)
