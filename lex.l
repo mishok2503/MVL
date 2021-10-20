@@ -1,3 +1,5 @@
+
+  
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,10 +56,21 @@ DEGREE          \|\^\|
 USER_OPERATOR   \|[^|]*\|
 COLON           \:
 STRING          \"[^"]*\"
-NAME_STRING     [A-Za-z][A-Za-z_0-9]*
-
+NAME_STRING     [A-Za-z][A-Za-z_0-9]+
+SQ_BR_OP        \[
+SQ_BR_CL        \]
 %%
 
+
+{SQ_BR_OP} {
+    yylval.sym = '[';
+    return SQ_BR_OP;
+}
+
+{SQ_BR_CL} {
+    yylval.sym = ']';
+    return SQ_BR_CL;
+}
 
 
 {INT} {

@@ -120,6 +120,8 @@ void output(node_args& arg){
 %token <word> INT2
 %token <sym> COLON
 %token <word> USER_OPERATOR
+%token <sym> SQ_BR_OP
+%token <sym> SQ_BR_CL
 
 %type <functions_def_type> func_def
 %type <function_type> function
@@ -171,12 +173,12 @@ operator: while { $$ = new node_operator($1); }
 | assignment QUESTION { $$ = new node_operator($1); }
 | function_call QUESTION { $$ = new node_operator($1); }
 
-while: WHILE OPEN_PAREN expression CLOSE_PAREN body { $$ = new while_op($3, $5); }
+while: WHILE SQ_BR_OP expression SQ_BR_CL body { $$ = new while_op($3, $5); }
 
-if: IF OPEN_PAREN expression CLOSE_PAREN body else { $$ = new if_op($3, $5, $6); }
+if: IF SQ_BR_OP expression SQ_BR_CL body else { $$ = new if_op($3, $5, $6); }
 
 else: %empty { $$ = nullptr; }
-| ELSE body { $$ = $2; }
+| ELSE  body { $$ = $2; } 
 
 skip: SKIP { $$ = new skip_op(); }
 
@@ -231,8 +233,33 @@ f: INT { $$ = new node_f($1); }
 | name { $$ = new node_f(2, $1); }
 | function_call { $$ = new node_f($1); }
 | literal { $$ = new node_f($1); }
+/*| IF {
+     std::string * s = new std::string("if");
+     $$ = new node_f(2, s);
+}
+| WHILE {
+    std::string * s = new std::string("while");
+    $$ = new node_f(2, s);
+}
+| SKIP {
+    std::string * s = new std::string("skip");
+    $$ = new node_f(2, s);
+}
+| ELSE {
+    std::string * s = new std::string("else");
+    $$ = new node_f(2, s);
+}
+| MAIN {
+    std::string * s = new std::string("main");
+    $$ = new node_f(2, s);
+} */
 
 name: NAME_STRING { $$ = $1; }
+| IF { $$ = new std::string("if"); }
+| WHILE { $$ = new std::string("while"); }
+| SKIP  { $$ = new std::string("skip"); } 
+/*| ELSE  { $$ = new std::string("else"); } */
+/*| MAIN  { $$ = new std::string("main"); } */
 %%
 
 int main(int argc, char ** argv)
