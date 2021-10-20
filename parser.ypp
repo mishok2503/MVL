@@ -13,6 +13,55 @@ node_body * main_body;
 std::vector <node_func *> functions_definition;
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
+void output(node_func_call * func_call);
+void output(std::vector <node_args> & args);
+void output(node_args & arg);
+/*
+std::string output(node_operator * op) {
+    std::stringstream ss;
+    ss << "{\n";
+    ss << "\"type\": \"operator\",\n";
+    ss << "\"operator_type\": " << op->type << ",\n";
+    ss << "\"operator\":"
+    ss << output(op->if_st) << output(op->while_st) << output(op->skip_st) << output(op->assign) << output(op->func_call);
+    ss << "}"
+    return ss.str();
+}
+
+void output(node_func_call * func_call)
+{
+    if (!func_call) {
+        return std::string{};
+    }
+    std::stringstream ss;
+    ss << "{\n";
+    ss << "\"TYPE\": \"FUNCTION CALL\",\n";
+    ss << "\"FUNCTION_NAME\": " << func_call->func_name << ",\n";
+    ss << "\"FUNCTION_ARGUMENTS\": ";
+    output(func_call->args); 
+    return ss.str();
+}
+
+void output(std::vector <node_args>& args){
+    for (auto arg : args)
+    {
+        output(arg);
+    }
+}
+
+void output(node_args& arg){
+    std::cerr << "{\n";
+    std::cerr << "\"TYPE\": \"ARGUMENT\",\n";
+    std::cerr << "\"ARGUMENT_TYPE\": " << arg.type << ",\n";
+    if (arg.type == "VARIABLE") {
+        std::cerr << "\"VARIABLE_NAME\": " << arg.var_name;
+    }
+    else {
+        std::cerr << "\"VALUE\": " << arg.value;
+    }
+    std::cerr << "}";
+}
+*/
 %}
 
 %union {
@@ -118,9 +167,9 @@ operator_sequence: %empty { $$ = new std::vector <node_operator *>(); }
 
 operator: while { $$ = new node_operator($1); }
 | if { $$ = new node_operator($1); }
-| skip { $$ = new node_operator($1); }
-| assignment { $$ = new node_operator($1); }
-| function_call { $$ = new node_operator($1); }
+| skip QUESTION { $$ = new node_operator($1); }
+| assignment QUESTION { $$ = new node_operator($1); }
+| function_call QUESTION { $$ = new node_operator($1); }
 
 while: WHILE OPEN_PAREN expression CLOSE_PAREN body { $$ = new while_op($3, $5); }
 
@@ -129,14 +178,19 @@ if: IF OPEN_PAREN expression CLOSE_PAREN body else { $$ = new if_op($3, $5, $6);
 else: %empty { $$ = nullptr; }
 | ELSE body { $$ = $2; }
 
-skip: SKIP QUESTION { $$ = new skip_op(); }
+skip: SKIP { $$ = new skip_op(); }
 
-assignment: name SW expression QUESTION { $$ = new assignment_op($1, $3); }
+assignment: name SW expression  { $$ = new assignment_op($1, $3); }
 
 function_call: name OPEN_PAREN args_seq CLOSE_PAREN { $$ = new node_func_call($1, $3); }
 
 args_seq: %empty { $$ = new std::vector <node_args>(); }
 | args_seq COMMA arg { $$->push_back(*$3); }
+| arg {
+    std::vector <node_args>* vec = new std::vector <node_args>();
+    vec->push_back(*$1);
+    $$ = vec;
+}
 
 arg: name { $$ = new node_args($1); }
 | INT { $$ = new node_args($1); }
@@ -183,8 +237,17 @@ name: NAME_STRING { $$ = $1; }
 
 int main(int argc, char ** argv)
 {
+    freopen(argv[1], "r", stdin);
     try{
         yyparse();
-    } catch(...){
+    } catch(std::exception & e){
+        std::cerr << e.what();
+        fclose(stdin);
+        return 1;
     }
+    fclose(stdin);
+   // output(main_body->first_op);
+   // for (auto op : main_body->operators) {
+     //   output(op);
+   // }
 }

@@ -1,14 +1,18 @@
 #include <string>
 #include <vector>
-
+#include <iostream>
 struct node_body;
+struct node_operator;
+struct node_func_call;
 
 struct node_args {
+    std::string type;
         std::string var_name;
         int value;
-    node_args(std::string * name) : var_name(*name) {}
-    node_args(int val) : value(val) {}
+    node_args(std::string * name) : type("VARIABLE"), var_name(*name) {}
+    node_args(int val) : type("VALUE"), value(val) {}
 };
+
 
 
 struct node_func_call  {
