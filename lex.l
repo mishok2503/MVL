@@ -53,6 +53,7 @@ PLUS            \|\+\|
 OPM             [|]([*]|[\/])[|]
 NOT_AS          \|(==|\/=|<=|<|>=|>)\|
 MINUS           \|-\|
+UNARY_MINUS     \-
 DEGREE          \|\^\|
 USER_OPERATOR   \|[^|]*\|
 COLON           \:
@@ -283,6 +284,12 @@ SQ_BR_CL        \]
     printf("readed MINUS\n");
     return MINUS;
 }
+
+{UNARY_MINUS} {
+    yylval.sym = '-';
+    return UNARY_MINUS;
+}
+
 {DEGREE}  {
     pos_before = position;
     position += 3;

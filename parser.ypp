@@ -195,9 +195,9 @@ args_seq: %empty { $$ = new std::vector <node_args>(); }
     $$ = vec;
 }
 
-arg: name { $$ = new node_args($1); }
+arg: name { $$ = new node_args(1, $1); }
 | INT { $$ = new node_args($1); }
-
+| INT2 { $$ = new node_args(2, $1); }
 expression: operation { $$ = new node_expr($1); }
 
 literal:  STRING { $$ = new node_literal($1); } 
@@ -234,26 +234,6 @@ f: INT { $$ = new node_f($1); }
 | name { $$ = new node_f(2, $1); }
 | function_call { $$ = new node_f($1); }
 | literal { $$ = new node_f($1); }
-/*| IF {
-     std::string * s = new std::string("if");
-     $$ = new node_f(2, s);
-}
-| WHILE {
-    std::string * s = new std::string("while");
-    $$ = new node_f(2, s);
-}
-| SKIP {
-    std::string * s = new std::string("skip");
-    $$ = new node_f(2, s);
-} 
-| ELSE {
-    std::string * s = new std::string("else");
-    $$ = new node_f(2, s);
-}
-| MAIN {
-    std::string * s = new std::string("main");
-    $$ = new node_f(2, s);
-} */
 
 name: NAME_STRING { $$ = $1; }
 | IF { $$ = new std::string("if"); }
