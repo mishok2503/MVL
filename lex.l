@@ -40,6 +40,7 @@ COMM_ON_STRING  \/\/
 COMMA           ,
 MAIN            main
 IF              if
+ENDIF           endif
 ELSE            else
 WHILE           while
 SKIP            skip
@@ -159,6 +160,12 @@ SQ_BR_CL        \]
     printf("readed MAIN\n");
     return MAIN;
 }
+
+{ENDIF} {
+    yylval.word = new std::string("endif");
+    return ENDIF;
+}
+
 {IF} {
     pos_before = position;
     position += 2;
