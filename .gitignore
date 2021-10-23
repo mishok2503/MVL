@@ -1,0 +1,4 @@
+*.out
+*.yy.c
+*.tab.cpp
+*.tab.hpp
