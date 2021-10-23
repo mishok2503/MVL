@@ -14,7 +14,7 @@ int num_of_str = 1;
 int num_of_open_comma = 0;
 int n, position = 1, pos_before, t;
 char c;
-
+FILE* log_file = fopen("lexer.log", "w");
 
 int check_comma() {
     if (num_of_open_comma > 0 || strcom == true)
@@ -82,7 +82,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.val = n;
-    printf("readed INT\n");
+    fprintf(log_file, "readed INT\n");
     return INT;
 }
 {INT2} {
@@ -91,7 +91,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
-    printf("readed INT2\n");
+    fprintf(log_file, "readed INT2\n");
     return INT2;
 }
 {OPEN_PAREN} {
@@ -100,7 +100,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = '(';
-    printf("readed OPEN_PAREN\n");
+    fprintf(log_file, "readed OPEN_PAREN\n");
     return OPEN_PAREN;
 }
 {CLOSE_PAREN} {
@@ -109,7 +109,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = ')';
-    printf("readed CLOSE_PAREN\n");
+    fprintf(log_file, "readed CLOSE_PAREN\n");
     return CLOSE_PAREN;
 }
 {CURLY_OPEN_BR} {
@@ -118,7 +118,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = '{';
-    printf("readed CURLY_OPEN_BR\n");
+    fprintf(log_file, "readed CURLY_OPEN_BR\n");
     return CURLY_OPEN_BR;
 }
 {CURLY_CLOSE_BR} {
@@ -127,7 +127,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = '}';
-    printf("readed CURLY_CLOSE_BR\n");
+    fprintf(log_file, "readed CURLY_CLOSE_BR\n");
     return CURLY_CLOSE_BR;
 }
 {COMM_OPEN}    {
@@ -135,7 +135,7 @@ SQ_BR_CL        \]
 }
 {COMM_CLOSE} {
     if (num_of_open_comma <=0) {
-        printf("ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
+        fprintf(log_file, "ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
         exit(1);
     }
     num_of_open_comma--;
@@ -149,7 +149,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = ',';
-    printf("readed COMMA\n");
+    fprintf(log_file, "readed COMMA\n");
     return COMMA;
 }
 {MAIN} {
@@ -158,7 +158,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("main", 5);
-    printf("readed MAIN\n");
+    fprintf(log_file, "readed MAIN\n");
     return MAIN;
 }
 
@@ -173,7 +173,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("if", 3);
-    printf("readed IF\n");
+    fprintf(log_file, "readed IF\n");
     return IF;
 }
 {ELSE} {
@@ -182,7 +182,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("else", 5);
-    printf("readed ELSE\n");
+    fprintf(log_file, "readed ELSE\n");
     return ELSE;
 }
 {WHILE} {
@@ -191,7 +191,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("while", 6);
-    printf("readed WHILE\n");
+    fprintf(log_file, "readed WHILE\n");
     return WHILE;
 }
 {SKIP} {
@@ -200,7 +200,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("skip", 5);
-    printf("readed SKIP\n");
+    fprintf(log_file, "readed SKIP\n");
     return SKIP;
 }
 {SW}   {
@@ -209,7 +209,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("|=|", 4);
-    printf("readed SW\n");
+    fprintf(log_file, "readed SW\n");
     return SW;
 }
 {QUESTION} {
@@ -218,7 +218,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = '?';
-    printf("readed QUESTION\n");
+    fprintf(log_file, "readed QUESTION\n");
     return QUESTION;
 }
 {AND} {
@@ -227,7 +227,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("&&", 3);
-    printf("readed AND\n");
+    fprintf(log_file, "readed AND\n");
     return AND;
 }
 {OR} {
@@ -236,7 +236,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("||", 3);
-    printf("readed OR\n");
+    fprintf(log_file, "readed OR\n");
     return OR;
 }
 {EXCLAM_P} {
@@ -245,7 +245,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = '!';
-    printf("readed EXCLAM_P\n");
+    fprintf(log_file, "readed EXCLAM_P\n");
     return EXCLAM_P;
 }
 {PLUS} {
@@ -254,7 +254,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("|+|", 4);
-    printf("readed PLUS\n");
+    fprintf(log_file, "readed PLUS\n");
     return PLUS;
 }
 {OPM}  {
@@ -263,7 +263,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
-    printf("readed OPM\n");
+    fprintf(log_file, "readed OPM\n");
     return OPM;
 }
 {NOT_AS}  {
@@ -272,7 +272,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
-    printf("readed NOT_AS\n");
+    fprintf(log_file, "readed NOT_AS\n");
     return NOT_AS;
 }
 {MINUS}  {
@@ -281,7 +281,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("|-|", 4);
-    printf("readed MINUS\n");
+    fprintf(log_file, "readed MINUS\n");
     return MINUS;
 }
 
@@ -296,7 +296,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("|^|", 4);
-    printf("readed DEGREE\n");
+    fprintf(log_file, "readed DEGREE\n");
     return DEGREE;
 }
 {USER_OPERATOR} {
@@ -305,7 +305,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
-    printf("readed USER_OPERATOR\n");
+    fprintf(log_file, "readed USER_OPERATOR\n");
     return USER_OPERATOR;
 }
 {COLON} {
@@ -314,7 +314,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.sym = ':';
-    printf("readed COLON\n");
+    fprintf(log_file, "readed COLON\n");
     return COLON;
 }
 {STRING}    {
@@ -323,7 +323,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
-    printf("readed STRING\n");
+    fprintf(log_file, "readed STRING\n");
     return STRING;
 }
 {NAME_STRING} {
@@ -332,7 +332,7 @@ SQ_BR_CL        \]
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
-    printf("readed NAME_STRING\n");
+    fprintf(log_file, "readed NAME_STRING\n");
     return NAME_STRING;
 }
 
@@ -350,15 +350,15 @@ SQ_BR_CL        \]
 
 <<EOF>>     {
     if (num_of_open_comma != 0) {
-    	printf("ERROR, unclosed comment\n");
+    	fprintf(log_file, "ERROR, unclosed comment\n");
 	exit(1);
     }
-    printf("(eof %u)\n", yylineno);
+    fprintf(log_file, "(eof %u)\n", yylineno);
     return 0;
 }
 
 . {
-printf("ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
+fprintf(log_file, "ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
 exit(1);
 }
 
