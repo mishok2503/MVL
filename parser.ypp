@@ -13,6 +13,10 @@ node_body * main_body;
 std::vector <node_func *> functions_definition;
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
+void output(node_func_call * func_call);
+void output(std::vector <node_args> & args);
+void output(node_args & arg);
+
 %}
 
 %union {
@@ -71,6 +75,9 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> INT2
 %token <sym> COLON
 %token <word> USER_OPERATOR
+%token <sym> SQ_BR_OP
+%token <sym> SQ_BR_CL
+%token <word> ENDIF
 
 %type <functions_def_type> func_def
 %type <function_type> function
@@ -118,29 +125,34 @@ operator_sequence: %empty { $$ = new std::vector <node_operator *>(); }
 
 operator: while { $$ = new node_operator($1); }
 | if { $$ = new node_operator($1); }
-| skip { $$ = new node_operator($1); }
-| assignment { $$ = new node_operator($1); }
-| function_call { $$ = new node_operator($1); }
+| skip QUESTION { $$ = new node_operator($1); }
+| assignment QUESTION { $$ = new node_operator($1); }
+| function_call QUESTION { $$ = new node_operator($1); }
 
-while: WHILE OPEN_PAREN expression CLOSE_PAREN body { $$ = new while_op($3, $5); }
+while: WHILE SQ_BR_OP expression SQ_BR_CL body { $$ = new while_op($3, $5); }
 
-if: IF OPEN_PAREN expression CLOSE_PAREN body else { $$ = new if_op($3, $5, $6); }
+if: IF SQ_BR_OP expression SQ_BR_CL body else ENDIF { $$ = new if_op($3, $5, $6); }
 
 else: %empty { $$ = nullptr; }
-| ELSE body { $$ = $2; }
+| ELSE  body { $$ = $2; } 
 
-skip: SKIP QUESTION { $$ = new skip_op(); }
+skip: SKIP { $$ = new skip_op(); }
 
-assignment: name SW expression QUESTION { $$ = new assignment_op($1, $3); }
+assignment: name SW expression  { $$ = new assignment_op($1, $3); }
 
 function_call: name OPEN_PAREN args_seq CLOSE_PAREN { $$ = new node_func_call($1, $3); }
 
 args_seq: %empty { $$ = new std::vector <node_args>(); }
 | args_seq COMMA arg { $$->push_back(*$3); }
+| arg {
+    std::vector <node_args>* vec = new std::vector <node_args>();
+    vec->push_back(*$1);
+    $$ = vec;
+}
 
-arg: name { $$ = new node_args($1); }
+arg: name { $$ = new node_args(1, $1); }
 | INT { $$ = new node_args($1); }
-
+| INT2 { $$ = new node_args(2, $1); }
 expression: operation { $$ = new node_expr($1); }
 
 literal:  STRING { $$ = new node_literal($1); } 
@@ -179,12 +191,23 @@ f: INT { $$ = new node_f($1); }
 | literal { $$ = new node_f($1); }
 
 name: NAME_STRING { $$ = $1; }
+| IF { $$ = new std::string("if"); }
+| WHILE { $$ = new std::string("while"); }
+| SKIP  { $$ = new std::string("skip"); } 
+| ELSE  { $$ = new std::string("else"); }
+| ENDIF { $$ = new std::string("endif"); }
+/*| MAIN  { $$ = new std::string("main"); } */
 %%
 
 int main(int argc, char ** argv)
 {
+    freopen(argv[1], "r", stdin);
     try{
         yyparse();
-    } catch(...){
+    } catch(std::exception & e){
+        std::cerr << e.what();
+        fclose(stdin);
+        return 1;
     }
+    fclose(stdin);
 }

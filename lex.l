@@ -1,3 +1,5 @@
+
+  
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +40,7 @@ COMM_ON_STRING  \/\/
 COMMA           ,
 MAIN            main
 IF              if
+ENDIF           endif
 ELSE            else
 WHILE           while
 SKIP            skip
@@ -50,14 +53,26 @@ PLUS            \|\+\|
 OPM             [|]([*]|[\/])[|]
 NOT_AS          \|(==|\/=|<=|<|>=|>)\|
 MINUS           \|-\|
+UNARY_MINUS     \-
 DEGREE          \|\^\|
 USER_OPERATOR   \|[^|]*\|
 COLON           \:
 STRING          \"[^"]*\"
-NAME_STRING     [A-Za-z][A-Za-z_0-9]*
-
+NAME_STRING     [A-Za-z][A-Za-z_0-9]+
+SQ_BR_OP        \[
+SQ_BR_CL        \]
 %%
 
+
+{SQ_BR_OP} {
+    yylval.sym = '[';
+    return SQ_BR_OP;
+}
+
+{SQ_BR_CL} {
+    yylval.sym = ']';
+    return SQ_BR_CL;
+}
 
 
 {INT} {
@@ -146,6 +161,12 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     printf("readed MAIN\n");
     return MAIN;
 }
+
+{ENDIF} {
+    yylval.word = new std::string("endif");
+    return ENDIF;
+}
+
 {IF} {
     pos_before = position;
     position += 2;
@@ -263,6 +284,12 @@ NAME_STRING     [A-Za-z][A-Za-z_0-9]*
     printf("readed MINUS\n");
     return MINUS;
 }
+
+{UNARY_MINUS} {
+    yylval.sym = '-';
+    return UNARY_MINUS;
+}
+
 {DEGREE}  {
     pos_before = position;
     position += 3;
