@@ -16,52 +16,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 void output(node_func_call * func_call);
 void output(std::vector <node_args> & args);
 void output(node_args & arg);
-/*
-std::string output(node_operator * op) {
-    std::stringstream ss;
-    ss << "{\n";
-    ss << "\"type\": \"operator\",\n";
-    ss << "\"operator_type\": " << op->type << ",\n";
-    ss << "\"operator\":"
-    ss << output(op->if_st) << output(op->while_st) << output(op->skip_st) << output(op->assign) << output(op->func_call);
-    ss << "}"
-    return ss.str();
-}
 
-void output(node_func_call * func_call)
-{
-    if (!func_call) {
-        return std::string{};
-    }
-    std::stringstream ss;
-    ss << "{\n";
-    ss << "\"TYPE\": \"FUNCTION CALL\",\n";
-    ss << "\"FUNCTION_NAME\": " << func_call->func_name << ",\n";
-    ss << "\"FUNCTION_ARGUMENTS\": ";
-    output(func_call->args); 
-    return ss.str();
-}
-
-void output(std::vector <node_args>& args){
-    for (auto arg : args)
-    {
-        output(arg);
-    }
-}
-
-void output(node_args& arg){
-    std::cerr << "{\n";
-    std::cerr << "\"TYPE\": \"ARGUMENT\",\n";
-    std::cerr << "\"ARGUMENT_TYPE\": " << arg.type << ",\n";
-    if (arg.type == "VARIABLE") {
-        std::cerr << "\"VARIABLE_NAME\": " << arg.var_name;
-    }
-    else {
-        std::cerr << "\"VALUE\": " << arg.value;
-    }
-    std::cerr << "}";
-}
-*/
 %}
 
 %union {
@@ -255,8 +210,4 @@ int main(int argc, char ** argv)
         return 1;
     }
     fclose(stdin);
-   // output(main_body->first_op);
-   // for (auto op : main_body->operators) {
-     //   output(op);
-   // }
 }
