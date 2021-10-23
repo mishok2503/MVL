@@ -13,9 +13,6 @@ node_body * main_body;
 std::vector <node_func *> functions_definition;
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
-void output(node_func_call * func_call);
-void output(std::vector <node_args> & args);
-void output(node_args & arg);
 
 %}
 
