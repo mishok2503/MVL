@@ -36,7 +36,7 @@ CURLY_OPEN_BR   \{
 CURLY_CLOSE_BR  \}
 COMM_OPEN       \+\_\+
 COMM_CLOSE      \-\_\-
-COMM_ON_STRING  \/\/
+COMM_ON_STRING  0\_\o
 COMMA           ,
 MAIN            main
 IF              if
