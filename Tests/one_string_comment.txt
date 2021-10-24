@@ -1,0 +1,7 @@
+abvgdeej
+// hehehaha
+main() {
+   //hahahehe
+   x |=| 10?
+   skip?
+}
