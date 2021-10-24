@@ -174,17 +174,16 @@ struct assignment_op {
 };
 
 struct node_operator {
-    std::string type;
-    if_op * if_st;
-    while_op * while_st;
-    skip_op * skip_st;
-    assignment_op * assign;
+    if_op * if_st = nullptr;
+    while_op * while_st = nullptr;
+    skip_op * skip_st = nullptr;
+    assignment_op * assign = nullptr;
     node_func_call * func_call;
-    node_operator(if_op * if_) : type("IF"), if_st(if_) {}
-    node_operator(while_op * while_st_) : type("WHILE"), while_st(while_st_) {}
-    node_operator(skip_op * skip_st_) : type("SKIP"), skip_st(skip_st_) {}
-    node_operator(assignment_op * assign_) : type("ASSIGNMENT"), assign(assign_) {}
-    node_operator(node_func_call * func_call_) : type("FUNCTION CALL"), func_call(func_call_) {} 
+    node_operator(if_op * if_) : if_st(if_) {}
+    node_operator(while_op * while_st_) : while_st(while_st_) {}
+    node_operator(skip_op * skip_st_) : skip_st(skip_st_) {}
+    node_operator(assignment_op * assign_) : assign(assign_) {}
+    node_operator(node_func_call * func_call_) : func_call(func_call_) {} 
 };
 
 struct node_body {

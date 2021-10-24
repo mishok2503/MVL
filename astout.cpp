@@ -7,51 +7,88 @@
 
 namespace {
 
+    using std::pair;
+    using std::string;
+
+    string out(const string& n) {
+        return '\"' + n + '\"';
+    }
+
+    string out(node_body*);
+    string out(node_operator*);
+    string out(if_op*);
+    string out(while_op*);
+    string out(skip_op*);
+    string out(assignment_op*);
+    string out(node_func_call*);
+
+    template<typename T>
+    string out(std::vector<T> *n) {
+        std::stringstream ss;
+        ss << '[';
+        for (const auto& i : *n) {
+            ss << out(i) << ',';
+        }
+        ss.seekp(-1, std::ios_base::end);
+        ss << ']';
+        return ss.str();
+    }
+
     template<typename... T>
-    std::string out_elem(T ...elem) {
+    string out_elem(T ...elem) {
         std::stringstream ss;
         ss << '{';
-        ((ss << '\"' << elem.first << "\": \"" << elem.second << "\","), ...);
+        ([&](const auto& e) {
+            if (e.second) {
+                ss << out(elem.first) << ": " << out(elem.second) << ',';
+            }
+        }(elem), ...);
         ss.seekp(-1, std::ios_base::end);
         ss << '}';
         return ss.str();
     }
 
-//    string out(node_operator* op) {
-//        sstream ss;
-//
-//
-//        return ss.str();
-//    }
-//
-//    string out(node_operator* fop, std::vector<node_operator*> ops) {
-//        sstream ss;
-//        ss << '[';
-//        ss << out(fop);
-//        for (const auto& op : ops) {
-//            ss << ',' << out(op);
-//        }
-//        ss << ']';
-//        return ss.str();
-//    }
-//
-//    string out(node_body* n) {
-//        sstream ss;
-//        ss << '{';
-//        ss << "\"type\": \"body\",";
-//        ss << "\"operators\": " << out(n->first_op, n->operators);
-//        ss << '}';
-//        return ss.str();
-//    }
+    string out(node_body* n) {
+        auto v = std::vector{n->first_op};
+        v.insert(v.end(), n->operators.begin(),  n->operators.end());
+        return out_elem(
+                pair{"type", "body"},
+                pair{"operators", &v});
+    }
+
+    string out(node_operator* n) {
+        string s = "operator";
+        return out_elem(
+                pair{"type", "operator"},
+                pair{s, n->if_st}, //Only one will be not nullptr
+                pair{s, n->while_st},
+                pair{s, n->skip_st},
+                pair{s, n->assign},
+                pair{s, n->func_call});
+    }
+
+    string out(if_op*) {
+        return "REMOVEME";
+    }
+    
+    string out(while_op*) {
+        return "REMOVEME";
+    }
+    
+    string out(skip_op*) {
+        return out_elem(pair{"type", "skip"});
+    }
+    
+    string out(assignment_op*) {
+        return "REMOVEME";
+    }
+    
+    string out(node_func_call*) {
+        return "REMOVEME";
+    }
 }
 
 
 std::string ast_out(std::vector<node_func*> funcs_defs, node_body* main_body) {
-    return out_elem(std::pair{"asd", "dsa"}, std::pair{"ewq", "ert"});
-//    std::stringstream ss;
-//    ss << '{';
-//    //ss << "\"functions\": " << out(funcs_defs);
-//    ss << "\"main\": " << out(main_body);
-//    ss << '}';
-//    return ss.str();
+    return out_elem(pair{"main", main_body});
 }
