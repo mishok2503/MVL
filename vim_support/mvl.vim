@@ -31,6 +31,8 @@ syn region MvlComment start=/+_+/ end=/-_-/ contains=MvlComment,ComKeyword
 syn keyword ComKeyword TODO MVL contained
 hi ComKeyword ctermfg=Blue
 hi MvlComment ctermfg=LightGrey
+noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape('0_o ','\/')<CR>/<CR>:nohlsearch<CR>
+noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape('0_o ','\/')<CR>//e<CR>:nohlsearch<CR>
 
 " Autocomplete
 set complete+=k~/.vim/mvl_keywords.txt
