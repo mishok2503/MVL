@@ -4,8 +4,8 @@ let b:current_syntax = "mvl"
 
 
 " Keywords
-syn keyword Keyword if while else
-syn keyword Keyword skip " other color
+syn keyword Keyword if endif while else
+syn keyword Keyword skip
 
 " Literals
 syn match Constant /\(\W\|^\)\@<=-*\d\+/

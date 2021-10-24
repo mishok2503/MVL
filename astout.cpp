@@ -21,6 +21,7 @@ namespace {
     string out(skip_op*);
     string out(assignment_op*);
     string out(node_func_call*);
+    string out(node_expr*);
 
     template<typename T>
     string out(std::vector<T> *n) {
@@ -40,7 +41,7 @@ namespace {
         ss << '{';
         ([&](const auto& e) {
             if (e.second) {
-                ss << out(elem.first) << ": " << out(elem.second) << ',';
+                ss << elem.first << ": " << out(elem.second) << ',';
             }
         }(elem), ...);
         ss.seekp(-1, std::ios_base::end);
@@ -67,8 +68,12 @@ namespace {
                 pair{s, n->func_call});
     }
 
-    string out(if_op*) {
-        return "REMOVEME";
+    string out(if_op* n) {
+        return out_elem(
+                pair{"type", "if"},
+                pair{"condition", n->cond},
+                pair{"if_branch", n->body},
+                pair{"else_branch", n->n_else});
     }
     
     string out(while_op*) {
@@ -84,6 +89,10 @@ namespace {
     }
     
     string out(node_func_call*) {
+        return "REMOVEME";
+    }
+
+    string out(node_expr* n) {
         return "REMOVEME";
     }
 }
