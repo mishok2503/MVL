@@ -1,3 +1,5 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
 #include <string>
 #include <vector>
 #include <iostream>
@@ -199,3 +201,4 @@ struct node_func {
     node_func(std::string * name_, std::vector <node_args> * args_, node_body * body_) : name(*name_), args(*args_), body(body_) {}
 };
 
+#endif //STRUCTURES_H

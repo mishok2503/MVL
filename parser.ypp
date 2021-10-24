@@ -9,6 +9,7 @@
 #include <vector>
 #include <fstream>
 #include "structures.h"
+#include "astout.h"
 node_body * main_body;
 std::vector <node_func *> functions_definition;
 int yylex(); 
@@ -207,4 +208,6 @@ int main(int argc, char ** argv)
         return 1;
     }
     fclose(stdin);
+
+    std::cout << ast_out(functions_definition, main_body) << '\n';
 }
