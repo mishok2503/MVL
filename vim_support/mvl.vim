@@ -4,8 +4,8 @@ let b:current_syntax = "mvl"
 
 
 " Keywords
-syn keyword Keyword if while else
-syn keyword Keyword skip " other color
+syn keyword Keyword if endif while else
+syn keyword Keyword skip
 
 " Literals
 syn match Constant /\(\W\|^\)\@<=-*\d\+/
@@ -27,6 +27,7 @@ hi AssOperator ctermfg=Green
 hi NonAssOperator ctermfg=Red
 
 " Comments
+syn match MvlComment /0_o.*/ contains=ComKeyword
 syn region MvlComment start=/+_+/ end=/-_-/ contains=MvlComment,ComKeyword
 syn keyword ComKeyword TODO MVL contained
 hi ComKeyword ctermfg=Blue

@@ -9,6 +9,7 @@
 #include <vector>
 #include <fstream>
 #include "structures.h"
+#include "astout.h"
 node_body * main_body;
 std::vector <node_func *> functions_definition;
 int yylex(); 
@@ -61,7 +62,7 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> OR
 %token <sym> EXCLAM_P
 %token <word> PLUS
-%token <sym> OPM
+%token <word> OPM
 %token <word> NOT_AS
 %token <word> MINUS
 %token <sym> DEGREE
@@ -207,4 +208,6 @@ int main(int argc, char ** argv)
         return 1;
     }
     fclose(stdin);
+
+    std::cout << ast_out(functions_definition, main_body) << '\n';
 }

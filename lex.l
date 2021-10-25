@@ -36,7 +36,7 @@ CURLY_OPEN_BR   \{
 CURLY_CLOSE_BR  \}
 COMM_OPEN       \+\_\+
 COMM_CLOSE      \-\_\-
-COMM_ON_STRING  \/\/
+COMM_ON_STRING  0\_\o
 COMMA           ,
 MAIN            main
 IF              if
@@ -47,8 +47,8 @@ SKIP            skip
 SW              \|\=\|
 QUESTION        \?
 AND             \&\&
-OR              \|\|
-EXCLAM_P        \|!\|
+OR              \|\|\|\|
+EXCLAM_P        !
 PLUS            \|\+\|
 OPM             [|]([*]|[\/])[|]
 NOT_AS          \|(==|\/=|<=|<|>=|>)\|
@@ -58,7 +58,7 @@ DEGREE          \|\^\|
 USER_OPERATOR   \|[^|]*\|
 COLON           \:
 STRING          \"[^"]*\"
-NAME_STRING     [A-Za-z][A-Za-z_0-9]+
+NAME_STRING     [A-Za-z][A-Za-z_0-9]*
 SQ_BR_OP        \[
 SQ_BR_CL        \]
 %%

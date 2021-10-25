@@ -1,5 +1,5 @@
-bison -d parser.ypp
-flex lex.l
-g++ parser.tab.cpp lex.yy.c 
-./a.out t.mvl 2> output.out
-cat output | jq
+bison -d parser.ypp &&
+flex lex.l &&
+g++ -std=c++20 parser.tab.cpp lex.yy.c astout.cpp &&
+./a.out t.mvl > ast.out &&
+cat ast.out | jq
