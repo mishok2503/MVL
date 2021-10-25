@@ -114,8 +114,23 @@ namespace {
                 pair{"right", n->expr});
     }
     
-    string out(node_func_call*) {
-        return "REMOVEME";
+    string out(node_func_call* n) {
+        return out_elem(
+                pair{"type", "function_call"},
+                pair{"function", &n->func_name},
+                pair{"arguments", &n->args});
+    }
+
+    string out(const node_args& n) {
+        auto p = pair{"type", "argument"};
+        switch (n.flag) {
+            case 1:
+                return out_elem(p, pair{"argument", n.var_name});
+            case 2:
+                return out_elem(p, pair{"argument", std::optional{*n.int2_value}});
+            default:
+                return out_elem(p, pair{"argument", std::optional{std::to_string(n.value)}});
+        }
     }
 
     string out(node_expr* n) {

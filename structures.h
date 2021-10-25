@@ -8,21 +8,19 @@ struct node_operator;
 struct node_func_call;
 
 struct node_args {
-    std::string type;
-    std::string var_name;
+    std::string * var_name;
     int value;
-    std::string int2_value;
-    node_args(int flag, std::string * name) {
+    int flag = 3;
+    std::string * int2_value;
+    node_args(int flag, std::string * name) : flag(flag) {
         if (flag == 1){
-            type = "VARIABLE";
-            var_name = *name; 
+            var_name = name; 
         }
         else {
-            type = "INT2";
-            int2_value = *name;
+            int2_value = name;
         }
     }
-    node_args(int val) : type("VALUE"), value(val) {}
+    node_args(int val) : value(val) {}
 };
 
 
