@@ -22,11 +22,13 @@ namespace {
     string out(skip_op*);
     string out(assignment_op*);
     string out(node_func_call*);
+    string out(const node_args& n);
     string out(node_expr*);
     string out(string*);
     string out(int);
     string out(string*, bool);
     string out(node_literal*);
+    string out(node_func*);
     string out(node_operation*);
     string out(node_m*);
     string out(node_e*);
@@ -67,6 +69,14 @@ namespace {
         ss.seekp(-1, std::ios_base::end);
         ss << '}';
         return ss.str();
+    }
+
+    string out(node_func* n) {
+        return out_elem(
+                pair{"type", "function_defenition"},
+                pair{"arguments", n->args.empty() ? nullptr : &n->args},
+                pair{"name", std::optional{n->name}},
+                pair{"body", n->body});
     }
 
     string out(node_body* n) {
@@ -118,7 +128,7 @@ namespace {
         return out_elem(
                 pair{"type", "function_call"},
                 pair{"function", &n->func_name},
-                pair{"arguments", &n->args});
+                pair{"arguments", n->args.empty() ? nullptr : &n->args});
     }
 
     string out(const node_args& n) {
@@ -264,5 +274,7 @@ namespace {
 
 
 std::string ast_out(std::vector<node_func*> funcs_defs, node_body* main_body) {
-    return out_elem(pair{"main", main_body});
+    return out_elem(
+            pair{"functions_defenitions", &funcs_defs},
+            pair{"main", main_body});
 }
