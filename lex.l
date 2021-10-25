@@ -1,5 +1,3 @@
-
-  
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +53,11 @@ NOT_AS          \|(==|\/=|<=|<|>=|>)\|
 MINUS           \|-\|
 UNARY_MINUS     \-
 DEGREE          \|\^\|
-USER_OPERATOR   \|[^|]*\|
+USER_OPERATOR_OPA   \|(\+|-)(\+|-|\*|\/|!|<|>|=|\^)+\|
+USER_OPERATOR_OPM  \|(\*|\/)(\+|-|\*|\/|!|<|>|=|\^)+\|
+USER_OPERATOR_DEG   \|\^(\+|-|\*|\/|!|<|>|=|\^)+\|
+USER_OPERATOR_EXCLAM \|!(\+|-|\*|\/|!|<|>|=|^)+\|
+USER_OPERATOR_NOT_AS \|(=|<|>)(\+|-|\*|\/|!|<|>|=|^)+\| 
 COLON           \:
 STRING          \"[^"]*\"
 NAME_STRING     [A-Za-z][A-Za-z_0-9]*
@@ -299,15 +301,59 @@ SQ_BR_CL        \]
     fprintf(log_file, "readed DEGREE\n");
     return DEGREE;
 }
-{USER_OPERATOR} {
+
+{USER_OPERATOR_OPA} {
     pos_before = position;
     position += yyleng;
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
     fprintf(log_file, "readed USER_OPERATOR\n");
-    return USER_OPERATOR;
+    return USER_OPERATOR_OPA;
 }
+
+{USER_OPERATOR_OPM} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_OPM;
+}
+
+{USER_OPERATOR_NOT_AS} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_NOT_AS;
+}
+
+{USER_OPERATOR_DEG} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_DEG;
+}
+
+{USER_OPERATOR_EXCLAM} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_EXCLAM;
+}
+
+
+
 {COLON} {
     pos_before = position;
     position ++;
@@ -363,3 +409,4 @@ exit(1);
 }
 
 %%
+

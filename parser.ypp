@@ -12,6 +12,7 @@
 #include "astout.h"
 node_body * main_body;
 std::vector <node_func *> functions_definition;
+std::vector <node_custom_op *> user_operators;
 int yylex(); 
 void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 
@@ -45,6 +46,8 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
   while_op * while_type;
   node_operator * operator_type;
   node_literal * literal_type;
+  node_custom_op * custom_op_type;
+  std::vector <node_custom_op *> * custom_op_def_type;
 };
 %token <val> INT
 %token <sym> OPEN_PAREN 
@@ -65,19 +68,24 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %token <word> OPM
 %token <word> NOT_AS
 %token <word> MINUS
-%token <sym> DEGREE
+%token <word> DEGREE
 %token <word> ELSE
 %token <word> MAIN
 %token <word> NAME_STRING
 %token <sym> UNARY_MINUS
 %token <word> INT2
 %token <sym> COLON
-%token <word> USER_OPERATOR
+%token <word> USER_OPERATOR_OPA
+%token <word> USER_OPERATOR_OPM
+%token <word> USER_OPERATOR_EXCLAM
+%token <word> USER_OPERATOR_DEG
+%token <word> USER_OPERATOR_NOT_AS
 %token <sym> SQ_BR_OP
 %token <sym> SQ_BR_CL
 %token <word> ENDIF
 
 %type <functions_def_type> func_def
+%type <custom_op_def_type> operator_def
 %type <function_type> function
 %type <word> name
 %type <func_args_type> args_seq
@@ -103,11 +111,24 @@ void yyerror(const char *p) { std::cerr << "Syntax error! "<< std::endl; }
 %type <t_type> t
 %type <o_type> o
 %type <f_type> f  
+%type <custom_op_type> custom_operator
+%type <word> user_operator
 %%
 
 start: defin main {}
 
-defin: func_def { functions_definition = *$1; }
+defin: operator_def func_def { user_operators = *$1; functions_definition = *$2; }
+
+operator_def: %empty { $$ = new std::vector <node_custom_op *>(); }
+| operator_def custom_operator { $$->push_back($2); }
+
+custom_operator: user_operator COLON body { $$ = new node_custom_op($1, $3); }
+
+user_operator: USER_OPERATOR_OPA { $$ = $1; }
+| USER_OPERATOR_OPM { $$ = $1; }
+| USER_OPERATOR_DEG { $$ = $1; }
+| USER_OPERATOR_EXCLAM { $$ = $1; }
+| USER_OPERATOR_NOT_AS { $$ = $1; }
 
 func_def: %empty { $$ = new std::vector <node_func *>(); } 
 | func_def function { $$->push_back($2); }
@@ -148,9 +169,10 @@ args_seq: %empty { $$ = new std::vector <node_args>(); }
     $$ = vec;
 }
 
-arg: name { $$ = new node_args(1, $1); }
+arg: /*name { $$ = new node_args(1, $1); }
 | INT { $$ = new node_args($1); }
-| INT2 { $$ = new node_args(2, $1); }
+| INT2 { $$ = new node_args(2, $1); } */
+expression { $$ = new node_args($1); }
 expression: operation { $$ = new node_expr($1); }
 
 literal:  STRING { $$ = new node_literal($1); } 
@@ -161,25 +183,30 @@ m: e OR m { $$ = new node_m($2, $1, $3); }
 | e { $$ = new node_m($1); }
 
 e: w AND e { $$ = new node_e($2, $1, $3); }
+| w USER_OPERATOR_EXCLAM e { $$ = new node_e($2, $1, $3); }
 | w { $$ = new node_e($1); }
 
 w: EXCLAM_P u { $$ = new node_w($1, $2); }
 | u { $$ = new node_w($1); }
 
 u: r NOT_AS r { $$ = new node_u($2, $1, $3); }
+| r USER_OPERATOR_NOT_AS r {$$ = new node_u($2, $1, $3); }
 | r { $$ = new node_u($1); }
 
 r: r PLUS q  { $$ = new node_r($2, $1, $3); }
 | r MINUS q { $$ = new node_r($2, $1, $3); }
+| r USER_OPERATOR_OPA q { $$ = new node_r($2, $1, $3); }
 | q { $$ = new node_r($1); }
 
 q: q OPM t { $$ = new node_q($2, $1, $3); } 
+| q USER_OPERATOR_OPM t { $$ = new node_q($2, $1, $3); }
 | t { $$ = new node_q($1); }
 
 t: UNARY_MINUS o { $$ = new node_t($1, $2); }
 | o { $$ = new node_t($1); }
 
-o: f DEGREE o { $$ = new node_o($1, $3); } 
+o: f DEGREE o { $$ = new node_o($2, $1, $3); } 
+| f USER_OPERATOR_DEG o { $$ = new node_o($2, $1, $3); }
 | f { $$ = new node_o($1); }
 
 f: INT { $$ = new node_f($1); }
@@ -194,7 +221,6 @@ name: NAME_STRING { $$ = $1; }
 | SKIP  { $$ = new std::string("skip"); } 
 | ELSE  { $$ = new std::string("else"); }
 | ENDIF { $$ = new std::string("endif"); }
-/*| MAIN  { $$ = new std::string("main"); } */
 %%
 
 int main(int argc, char ** argv)
