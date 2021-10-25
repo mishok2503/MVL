@@ -40,98 +40,82 @@ struct node_literal  {
 
 
 struct node_f {
-        int value;
-        std::string var_name;
-        node_func_call * func_call;
-        node_literal * literal;
-        std::string int2_value;
+    int value;
+    std::string * var_name = nullptr;
+    node_func_call * func_call = nullptr;
+    node_literal * literal = nullptr;
+    std::string * int2_value = nullptr;
     node_f(node_literal * literal_) : literal(literal_) {} 
     node_f(int v) : value(v) {}
     node_f(int flag, std::string * name){
         if (flag == 1){
-            int2_value = *name;
+            int2_value = name;
         }
         if (flag == 2){
-            var_name = *name;
+            var_name = name;
         }
     }
     node_f(node_func_call * func) : func_call(func) {} 
 };
 
 struct node_o {
-    std::string type;
     node_f * f;
     node_o * o;
-    node_o(node_f * f_, node_o * o_) : type("DEGREE"), f(f_), o(o_) {}
-    node_o(node_f * f_) : type("NOTHING"), f(f_), o(nullptr) {}
+    node_o(node_f * f_, node_o * o_) : f(f_), o(o_) {}
+    node_o(node_f * f_) : f(f_), o(nullptr) {}
 };
 
 struct node_t {
-    std::string type;
+    bool empty = true;
     node_o * o;
-    node_t(char a, node_o * o_) : type("MINUS"), o(o_) {}
-    node_t(node_o * o_) : type("NOTHING"), o(o_) {} 
+    node_t(char a, node_o * o_) : o(o_), empty(false) {}
+    node_t(node_o * o_) : o(o_) {} 
 };
 
 struct node_q {
-    std::string type;
-    node_q * q;
+    node_q * q = nullptr;
     node_t * t;
-    node_q(node_t * t_) : type("NOTHING"), t(t_) {}
-    node_q(char op, node_q * q_, node_t * t_): q(q_), t(t_) {
-        if (op == '*'){
-            type = "MULT";
-        }
-        if (op == '/'){
-            type = "DIV";
-        }
+    std::string op;
+    node_q(node_t * t_) : t(t_) {}
+    node_q(std::string* op, node_q * q_, node_t * t_): q(q_), t(t_), op(*op) {
     }
 };
 
 struct node_r {
-    std::string type;
     node_r * r;
     node_q * q;
+    std::string op;
     node_r(node_q * q_) : r(nullptr), q(q_){}
-    node_r(std::string * op, node_r * r_, node_q * q_) : r(r_), q(q_) {
-        if (*op == "|+|"){
-            type = "PLUS";
-        }
-        if (*op == "|-|"){
-            type = "MINUS";
-        }
-    }
+    node_r(std::string* op, node_r * r_, node_q * q_) : r(r_), q(q_), op(*op) {}
 };
 
 struct node_u {
-    std::string type;
     node_r * r1;
-    node_r * r2;
-    node_u(std::string * op, node_r * r1_, node_r * r2_) : type(*op), r1(r1_), r2(r2_) {}
-    node_u(node_r * r1_) : type("NOTHING"), r1(r1_) {} 
+    node_r * r2 = nullptr;
+    std::string op;
+    node_u(std::string * op, node_r * r1_, node_r * r2_) : r1(r1_), r2(r2_), op(*op) {}
+    node_u(node_r * r1_) : r1(r1_) {} 
 };
 
-struct node_w { 
-    std::string type;
+struct node_w {
+    bool empty = true;
     node_u * u;
-    node_w(node_u * u_) : type("NOTHING"), u(u_) {}
-    node_w(char op, node_u * u_) : type("UNARY MINUS"), u(u_) {}
+    node_w(node_u * u_) : u(u_) {}
+    node_w(char op, node_u * u_) : u(u_), empty(false) {}
 };
 
 struct node_e {
-    std::string type;
     node_w * w;
     node_e * e;
-    node_e(node_w * w_) : type("NOTHING"), e(nullptr), w(w_) {}
-    node_e(std::string * op, node_w * w_, node_e * e_) : type("AND"), w(w_), e(e_) {}
+    node_e(node_w * w_) : e(nullptr), w(w_) {}
+    node_e(std::string * op, node_w * w_, node_e * e_) : w(w_), e(e_) {}
 };
 
 struct node_m {
-    std::string type;
     node_e * e;
     node_m * m;
-    node_m(node_e * e_) : type("NOTHING"), e(e_), m(nullptr) {}
-    node_m(std::string * op, node_e * e_, node_m * m_) : type("OR"), e(e_), m(m_) {}
+    node_m(node_e * e_) : e(e_), m(nullptr) {}
+    node_m(std::string * op, node_e * e_, node_m * m_) : e(e_), m(m_) {}
 };
 
 struct node_operation {
@@ -140,14 +124,7 @@ struct node_operation {
 };
 
 struct node_expr {
-    std::string type;
-        node_literal *  literal;
-        std::string var_name;
-        node_func_call * func_call;
-        node_operation * operation;
-    node_expr(std::string * str) : var_name(*str) {}
-    node_expr(node_literal * lit) : literal(lit) {}
-    node_expr(node_func_call * func) : func_call(func) {}
+    node_operation * operation = nullptr;
     node_expr(node_operation * op) : operation(op) {}
 }; 
 
