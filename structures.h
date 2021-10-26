@@ -6,24 +6,18 @@
 struct node_body;
 struct node_operator;
 struct node_func_call;
+struct node_expr;
 
 struct node_args {
-    std::string * var_name;
-    int value;
-    int flag = 3;
-    std::string * int2_value;
-    node_args(int flag, std::string * name) : flag(flag) {
-        if (flag == 1){
-            var_name = name; 
-        }
-        else {
-            int2_value = name;
-        }
-    }
-    node_args(int val) : value(val) {}
+    node_expr * expr;
+    node_args(node_expr * expr_) : expr(expr_) {}
 };
 
-
+struct node_custom_op {
+    std::string * op;
+    node_body * body;
+    node_custom_op(std::string * op_, node_body * body_) : op(op_), body(body_){}
+};
 
 struct node_func_call  {
     std::string func_name;
@@ -59,7 +53,8 @@ struct node_f {
 struct node_o {
     node_f * f;
     node_o * o;
-    node_o(node_f * f_, node_o * o_) : f(f_), o(o_) {}
+    std::string * op;
+    node_o(std::string * op_, node_f * f_, node_o * o_) : op(op_), f(f_), o(o_) {}
     node_o(node_f * f_) : f(f_), o(nullptr) {}
 };
 

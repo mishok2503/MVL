@@ -1,5 +1,3 @@
-
-  
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +53,11 @@ NOT_AS          \|(==|\/=|<=|<|>=|>)\|
 MINUS           \|-\|
 UNARY_MINUS     \-
 DEGREE          \|\^\|
-USER_OPERATOR   \|[^|]*\|
+USER_OPERATOR_OPA   \|(\+|-)(\+|-|\*|\/|!|<|>|=|\^)+\|
+USER_OPERATOR_OPM  \|(\*|\/)(\+|-|\*|\/|!|<|>|=|\^)+\|
+USER_OPERATOR_DEG   \|\^(\+|-|\*|\/|!|<|>|=|\^)+\|
+USER_OPERATOR_EXCLAM \|!(\+|-|\*|\/|!|<|>|=|^)+\|
+USER_OPERATOR_NOT_AS \|(=|<|>)(\+|-|\*|\/|!|<|>|=|^)+\| 
 COLON           \:
 STRING          \"[^"]*\"
 NAME_STRING     [A-Za-z][A-Za-z_0-9]*
@@ -157,13 +159,13 @@ SQ_BR_CL        \]
     position += 4;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("main", 5);
+    yylval.word = new std::string("main", yyleng);
     fprintf(log_file, "readed MAIN\n");
     return MAIN;
 }
 
 {ENDIF} {
-    yylval.word = new std::string("endif");
+    yylval.word = new std::string("endif", yyleng);
     return ENDIF;
 }
 
@@ -172,7 +174,7 @@ SQ_BR_CL        \]
     position += 2;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("if", 3);
+    yylval.word = new std::string("if", yyleng);
     fprintf(log_file, "readed IF\n");
     return IF;
 }
@@ -181,7 +183,7 @@ SQ_BR_CL        \]
     position += 4;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("else", 5);
+    yylval.word = new std::string("else", yyleng);
     fprintf(log_file, "readed ELSE\n");
     return ELSE;
 }
@@ -190,7 +192,7 @@ SQ_BR_CL        \]
     position += 5;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("while", 6);
+    yylval.word = new std::string("while", yyleng);
     fprintf(log_file, "readed WHILE\n");
     return WHILE;
 }
@@ -199,7 +201,7 @@ SQ_BR_CL        \]
     position += 4;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("skip", 5);
+    yylval.word = new std::string("skip", yyleng);
     fprintf(log_file, "readed SKIP\n");
     return SKIP;
 }
@@ -208,7 +210,7 @@ SQ_BR_CL        \]
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("|=|", 4);
+    yylval.word = new std::string("|=|", yyleng);
     fprintf(log_file, "readed SW\n");
     return SW;
 }
@@ -226,7 +228,7 @@ SQ_BR_CL        \]
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("&&", 3);
+    yylval.word = new std::string("&&", yyleng);
     fprintf(log_file, "readed AND\n");
     return AND;
 }
@@ -235,7 +237,7 @@ SQ_BR_CL        \]
     position += 2;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("||", 3);
+    yylval.word = new std::string("||", yyleng);
     fprintf(log_file, "readed OR\n");
     return OR;
 }
@@ -253,7 +255,7 @@ SQ_BR_CL        \]
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("|+|", 4);
+    yylval.word = new std::string("|+|", yyleng);
     fprintf(log_file, "readed PLUS\n");
     return PLUS;
 }
@@ -280,7 +282,7 @@ SQ_BR_CL        \]
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("|-|", 4);
+    yylval.word = new std::string("|-|", yyleng);
     fprintf(log_file, "readed MINUS\n");
     return MINUS;
 }
@@ -295,19 +297,63 @@ SQ_BR_CL        \]
     position += 3;
     if (check_comma() == 1)
         break;
-    yylval.word = new std::string("|^|", 4);
+    yylval.word = new std::string("|^|", yyleng);
     fprintf(log_file, "readed DEGREE\n");
     return DEGREE;
 }
-{USER_OPERATOR} {
+
+{USER_OPERATOR_OPA} {
     pos_before = position;
     position += yyleng;
     if (check_comma() == 1)
         break;
     yylval.word = new std::string(yytext, yyleng);
     fprintf(log_file, "readed USER_OPERATOR\n");
-    return USER_OPERATOR;
+    return USER_OPERATOR_OPA;
 }
+
+{USER_OPERATOR_OPM} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_OPM;
+}
+
+{USER_OPERATOR_NOT_AS} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_NOT_AS;
+}
+
+{USER_OPERATOR_DEG} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_DEG;
+}
+
+{USER_OPERATOR_EXCLAM} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
+    yylval.word = new std::string(yytext, yyleng);
+    fprintf(log_file, "readed USER_OPERATOR\n");
+    return USER_OPERATOR_EXCLAM;
+}
+
+
+
 {COLON} {
     pos_before = position;
     position ++;
@@ -365,3 +411,4 @@ SQ_BR_CL        \]
 }
 
 %%
+
