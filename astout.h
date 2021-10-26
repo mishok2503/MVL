@@ -5,6 +5,8 @@
 #include <vector>
 #include "structures.h"
 
-std::string ast_out(std::vector<node_func*> funcs_defs, node_body* main_body);
+std::string ast_out(std::vector<node_custom_op*>& ops, //TODO: const everywhere
+                    std::vector<node_func*>& funcs_defs,
+                    node_body* main_body);
 
 #endif //ASTOUT_H
