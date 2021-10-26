@@ -358,8 +358,10 @@ SQ_BR_CL        \]
 }
 
 . {
-fprintf(log_file, "ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
-exit(1);
+    if (check_comma() == 0) {
+        fprintf(log_file, "ERROR in line %u, symbol %s position %u\n", yylineno, yytext, position);
+        exit(1);
+    }
 }
 
 %%
