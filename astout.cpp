@@ -15,6 +15,7 @@ namespace {
         return '\"' + n + '\"';
     }
 
+    string out(node_custom_op*);
     string out(node_body*);
     string out(node_operator*);
     string out(if_op*);
@@ -49,10 +50,12 @@ namespace {
     string out(std::vector<T> *n) {
         std::stringstream ss;
         ss << '[';
-        for (const auto& i : *n) {
-            ss << out(i) << ',';
+        if (!n->empty()) {
+            for (const auto& i : *n) {
+                ss << out(i) << ',';
+            }
+            ss.seekp(-1, std::ios_base::end);
         }
-        ss.seekp(-1, std::ios_base::end);
         ss << ']';
         return ss.str();
     }
@@ -69,6 +72,14 @@ namespace {
         ss.seekp(-1, std::ios_base::end);
         ss << '}';
         return ss.str();
+    }
+
+    
+    string out(node_custom_op* n) {
+        return out_elem(
+                pair{"type", "user_operator"},
+                pair{"operator", std::optional{*n->op}},
+                pair{"body", n->body});
     }
 
     string out(node_func* n) {
@@ -132,15 +143,9 @@ namespace {
     }
 
     string out(const node_args& n) {
-        auto p = pair{"type", "argument"};
-        switch (n.flag) {
-            case 1:
-                return out_elem(p, pair{"argument", n.var_name});
-            case 2:
-                return out_elem(p, pair{"argument", std::optional{*n.int2_value}});
-            default:
-                return out_elem(p, pair{"argument", std::optional{std::to_string(n.value)}});
-        }
+        return out_elem(
+                pair{"type", "argument"},
+                pair{"argument", n.expr});
     }
 
     string out(node_expr* n) {
@@ -273,8 +278,11 @@ namespace {
 }
 
 
-std::string ast_out(std::vector<node_func*> funcs_defs, node_body* main_body) {
+std::string ast_out(std::vector<node_custom_op*>& ops, //TODO: const everywhere
+                    std::vector<node_func*>& funcs_defs,
+                    node_body* main_body) {
     return out_elem(
+            pair{"user_operators", &ops},
             pair{"functions_defenitions", &funcs_defs},
             pair{"main", main_body});
 }

@@ -169,10 +169,8 @@ args_seq: %empty { $$ = new std::vector <node_args>(); }
     $$ = vec;
 }
 
-arg: /*name { $$ = new node_args(1, $1); }
-| INT { $$ = new node_args($1); }
-| INT2 { $$ = new node_args(2, $1); } */
-expression { $$ = new node_args($1); }
+arg: expression { $$ = new node_args($1); }
+
 expression: operation { $$ = new node_expr($1); }
 
 literal:  STRING { $$ = new node_literal($1); } 
@@ -235,5 +233,5 @@ int main(int argc, char ** argv)
     }
     fclose(stdin);
 
-    std::cout << ast_out(functions_definition, main_body) << '\n';
+    std::cout << ast_out(user_operators, functions_definition, main_body) << '\n';
 }
