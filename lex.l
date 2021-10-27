@@ -34,7 +34,7 @@ CURLY_OPEN_BR   \{
 CURLY_CLOSE_BR  \}
 COMM_OPEN       \+\_\+
 COMM_CLOSE      \-\_\-
-COMM_ON_STRING  0\_\o
+COMM_ON_STRING  O\_\o
 COMMA           ,
 MAIN            main
 IF              if
@@ -67,11 +67,19 @@ SQ_BR_CL        \]
 
 
 {SQ_BR_OP} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
     yylval.sym = '[';
     return SQ_BR_OP;
 }
 
 {SQ_BR_CL} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
     yylval.sym = ']';
     return SQ_BR_CL;
 }
@@ -156,7 +164,7 @@ SQ_BR_CL        \]
 }
 {MAIN} {
     pos_before = position;
-    position += 4;
+    position += yyleng;
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("main", yyleng);
@@ -165,13 +173,17 @@ SQ_BR_CL        \]
 }
 
 {ENDIF} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
     yylval.word = new std::string("endif", yyleng);
     return ENDIF;
 }
 
 {IF} {
     pos_before = position;
-    position += 2;
+    position += yyleng;
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("if", yyleng);
@@ -180,7 +192,7 @@ SQ_BR_CL        \]
 }
 {ELSE} {
     pos_before = position;
-    position += 4;
+    position += yyleng;
     if (check_comma() == 1)
         break;
     yylval.word = new std::string("else", yyleng);
@@ -288,6 +300,10 @@ SQ_BR_CL        \]
 }
 
 {UNARY_MINUS} {
+    pos_before = position;
+    position += yyleng;
+    if (check_comma() == 1)
+        break;
     yylval.sym = '-';
     return UNARY_MINUS;
 }
