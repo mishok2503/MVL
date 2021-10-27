@@ -1,7 +1,6 @@
-abvgdeej
-// hehehaha
+O_o hehehaha
 main() {
-   //hahahehe
+   O_o hahahehe
    x |=| 10?
    skip?
 }

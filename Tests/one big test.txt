@@ -1,14 +1,14 @@
-(a |+| b): {
-    
+|++|: {
+    skip?
 }
 
-(a |~| b): {
-    
+|/+|: {
+    skip?
 }
 
 f() {
     a |=| 3?
-    1 |+| 2 |+| --1 |>=| 234?
+    x |=| 1 |+| 2 |+| --1 |>=| 234?
 }
 
 f2(a, b, c) {
@@ -24,33 +24,34 @@ main() {
 
     skip?skip?
 
-    if (1 |~| 2) {
+    if [1 |++| 2] {
         skip?
     } else {
-        1 |+| 3?
-    }
+        z |=| 1 |+| 3?
+    } endif
 
-    +_+ asdasdasd -_-    1 + 2?
+    +_+ asdasdasd -_-    a |=| 1 |+| 2?
 
     +_+
         asdasdasd -_-
-    O_o hehehaha
 
-    a |=| 1 |~| 
+    O_o
+
+    a |=| 1 |/+| 
 
                             3?
 
-    if (2) {
+    if [2] {
         skip? 
-    }
+    } endif
 
-    while (1 |>| 2) {
+    while [1 |>| 2] {
         skip?
     }
 
     f()?
 
-    while (f2(1, f, 2 + 5)) {
+    while [f2(1, f, 2 |+| 5)] {
         w |=| 1?
     }
 }
