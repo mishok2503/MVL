@@ -14,7 +14,7 @@ f_name(arg1, arg2) {
 ##### Loops
 
 ```
-while (expr) {
+while [expr] {
     skip?
 }
 ```
@@ -27,23 +27,23 @@ operator = `|(base operators)+|`
 ##### If
 
 ```
-if (expr) {
+if [expr] {
     skip?
-} 
+} endif
 ```
 
 ```
-if (expr) {
+if [expr] {
     skip?
 } else {
     skip?
-}
+} endif
 ```
 
 ##### Operators overloading
 
 ```
-(l |new operator| r): {
+|new operator|: {
     skip?
 }
 ```
