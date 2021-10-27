@@ -1,0 +1,6 @@
+O_o hehehaha
+main() {
+   O_o hahahehe
+   x = 10?
+   skip?
+}

@@ -1,0 +1,5 @@
+main() {
+  something_what_really_matter1?
+  +_+ something_what_not_matter -_-
+  something_what_really_matter2?
+}
