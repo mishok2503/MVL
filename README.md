@@ -19,7 +19,10 @@ while [expr] {
 }
 ```
 
-##### Operators
+##### Default operators
+`|+|, |-|, |^|, |==|, |<=|, |>=|, ||||, |&&|, |*|, |/|, !, -`
+
+##### User operators
 
 base operators: `+, -, *, /, ^, !, <, >, =, [<>=/]=`
 operator = `|(base operators)+|`
