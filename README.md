@@ -1,6 +1,14 @@
 # MVL
 ### a.k.a Most Valuable Language
 
+## Build
+
+```
+git clone https://github.com/mishok2503/MVL.git
+cd MVL/
+./run.sh <file-name>
+```
+Parser output AST to file `<file-name>.out` in JSON. Lexer output logs to file `lexer.log`.
 ## Syntax
 
 ##### Functions defenitions
