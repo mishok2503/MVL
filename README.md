@@ -21,7 +21,7 @@ while [expr] {
 
 ##### Operators
 
-base operators: `+, -, *, /, ^, !, <, >, =, [<>=/]=`
+base operators: |[ `+, -, *, /, ^, !, <, >, =, [<>=/]=`]|
 operator = `|(base operators)+|`
 
 ##### If
